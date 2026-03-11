@@ -1,0 +1,264 @@
+/* ── Dark theme (Bootstrap 5.3 data-bs-theme) ── */
+
+[data-bs-theme="dark"] {
+  --app-bg: #000000;
+  --app-surface: #1c1c1e;
+  --app-surface-2: #2c2c2e;
+  --app-surface-3: #3a3a3c;
+  --app-text: #f5f5f7;
+  --app-text-secondary: #98989d;
+  --app-border: #38383a;
+  --app-accent: #0a84ff;
+  --app-accent-hover: #409cff;
+  --app-success: #30d158;
+  --app-danger: #ff453a;
+  --app-warning: #ffd60a;
+  --bs-body-bg: var(--app-bg);
+  --bs-body-color: var(--app-text);
+  --bs-border-color: var(--app-border);
+}
+
+[data-bs-theme="light"] {
+  --app-bg: #f5f5f7;
+  --app-surface: #ffffff;
+  --app-surface-2: #f2f2f7;
+  --app-surface-3: #e5e5ea;
+  --app-text: #1d1d1f;
+  --app-text-secondary: #86868b;
+  --app-border: #d2d2d7;
+  --app-accent: #0071e3;
+  --app-accent-hover: #0077ed;
+  --app-success: #34c759;
+  --app-danger: #ff3b30;
+  --app-warning: #ff9f0a;
+}
+
+/* ── Base ── */
+
+body {
+  background-color: var(--app-bg) !important;
+  color: var(--app-text);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Cards ── */
+
+.card {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--app-border) !important;
+}
+
+.album-card,
+.song-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.album-card:hover,
+.song-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ── Navbar ── */
+
+.navbar {
+  background-color: var(--app-surface) !important;
+  border-bottom: 1px solid var(--app-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ── Forms ── */
+
+.form-control,
+.form-select {
+  background-color: var(--app-surface-2) !important;
+  border-color: var(--app-border) !important;
+  color: var(--app-text) !important;
+  border-radius: 8px !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25) !important;
+}
+
+.form-control::placeholder {
+  color: var(--app-text-secondary) !important;
+}
+
+.form-check-input {
+  background-color: var(--app-surface-3) !important;
+  border-color: var(--app-border) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--app-accent) !important;
+  border-color: var(--app-accent) !important;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--app-success) !important;
+  border-color: var(--app-success) !important;
+}
+
+/* ── Buttons ── */
+
+.btn-primary {
+  background-color: var(--app-accent) !important;
+  border-color: var(--app-accent) !important;
+  border-radius: 8px !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--app-accent-hover) !important;
+  border-color: var(--app-accent-hover) !important;
+}
+
+.btn-outline-secondary {
+  border-color: var(--app-border) !important;
+  color: var(--app-text-secondary) !important;
+  border-radius: 8px !important;
+}
+
+.btn-outline-danger {
+  color: var(--app-danger) !important;
+  border-color: var(--app-danger) !important;
+  border-radius: 8px !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--app-danger) !important;
+  color: white !important;
+}
+
+/* ── Badges ── */
+
+.badge {
+  border-radius: 20px !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* ── Progress bars ── */
+
+.progress {
+  background-color: var(--app-surface-3) !important;
+  border-radius: 4px !important;
+  overflow: hidden;
+}
+
+.progress-bar {
+  border-radius: 4px !important;
+  transition: width 0.4s ease;
+}
+
+/* ── List groups ── */
+
+.list-group-item {
+  background-color: transparent !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+/* ── Modals ── */
+
+.modal-content {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 14px !important;
+}
+
+.modal-header {
+  border-bottom-color: var(--app-border) !important;
+}
+
+.modal-footer {
+  border-top-color: var(--app-border) !important;
+}
+
+/* ── Dropdowns ── */
+
+.dropdown-menu {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+  color: var(--app-text) !important;
+  border-radius: 6px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--app-surface-2) !important;
+}
+
+/* ── Input groups ── */
+
+.input-group-text {
+  background-color: var(--app-surface-2) !important;
+  border-color: var(--app-border) !important;
+  color: var(--app-text-secondary) !important;
+}
+
+/* ── Timeline ── */
+
+.timeline-btn {
+  transition: background-color 0.2s ease;
+  border-radius: 10px !important;
+}
+
+.timeline-btn:hover {
+  background-color: var(--app-surface-2) !important;
+}
+
+.timeline-btn.active {
+  background-color: rgba(10, 132, 255, 0.12) !important;
+}
+
+/* ── Scrollbar (webkit) ── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--app-surface-3);
+  border-radius: 3px;
+}
+
+/* ── Misc ── */
+
+.text-secondary {
+  color: var(--app-text-secondary) !important;
+}
+
+a {
+  color: var(--app-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--app-accent-hover);
+}
+
+::selection {
+  background-color: rgba(10, 132, 255, 0.3);
+}
