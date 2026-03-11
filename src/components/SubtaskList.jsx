@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form, InputGroup, Button, ListGroup } from 'react-bootstrap';
 import { BsPlusLg, BsTrash } from 'react-icons/bs';
 
 export default function SubtaskList({ subtasks, onAdd, onToggle, onDelete }) {
+  const { t } = useTranslation('components');
   const [newTitle, setNewTitle] = useState('');
 
   function handleAdd(e) {
@@ -17,7 +19,7 @@ export default function SubtaskList({ subtasks, onAdd, onToggle, onDelete }) {
       <Form onSubmit={handleAdd} className="mb-2">
         <InputGroup size="sm">
           <Form.Control
-            placeholder="Nueva subtarea..."
+            placeholder={t('subtaskList.placeholder')}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
           />
@@ -28,7 +30,7 @@ export default function SubtaskList({ subtasks, onAdd, onToggle, onDelete }) {
       </Form>
 
       {subtasks.length === 0 && (
-        <p className="text-muted text-center small py-2 mb-0">No hay subtareas.</p>
+        <p className="text-muted text-center small py-2 mb-0">{t('subtaskList.empty')}</p>
       )}
 
       <ListGroup variant="flush">

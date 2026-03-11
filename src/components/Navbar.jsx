@@ -1,13 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Navbar as BsNavbar, Nav, Container, Button } from 'react-bootstrap';
-import { BsMusicNoteBeamed, BsBoxArrowRight, BsPersonCircle, BsSunFill, BsMoonFill } from 'react-icons/bs';
+import { BsMusicNoteBeamed, BsBoxArrowRight, BsPersonCircle, BsSunFill, BsMoonFill, BsTranslate } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 
 export default function AppNavbar() {
   const { user, logout } = useAuthContext();
   const { theme, toggleTheme } = useTheme();
+  const { t, i18n } = useTranslation('navbar');
   const navigate = useNavigate();
+
+  function toggleLanguage() {
+    i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
+  }
 
   async function handleLogout() {
     await logout();
@@ -21,20 +27,29 @@ export default function AppNavbar() {
       <Container>
         <BsNavbar.Brand as={Link} to="/dashboard" className="d-flex align-items-center gap-2 fw-bold">
           <BsMusicNoteBeamed size={20} />
-          Album Tracker
+          {t('brand')}
         </BsNavbar.Brand>
         <BsNavbar.Toggle aria-controls="main-nav" />
         <BsNavbar.Collapse id="main-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
+            <Nav.Link as={Link} to="/dashboard">{t('dashboard')}</Nav.Link>
           </Nav>
           <Nav className="d-flex align-items-center gap-2">
             <Button
               variant="link"
               size="sm"
+              onClick={toggleLanguage}
+              className="p-1 text-secondary"
+              title={t('language')}
+            >
+              <BsTranslate size={18} />
+            </Button>
+            <Button
+              variant="link"
+              size="sm"
               onClick={toggleTheme}
               className="p-1 text-secondary"
-              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+              title={theme === 'dark' ? t('lightMode') : t('darkMode')}
             >
               {theme === 'dark' ? <BsSunFill size={18} /> : <BsMoonFill size={18} />}
             </Button>
@@ -44,7 +59,7 @@ export default function AppNavbar() {
             </Nav.Link>
             <Button variant="outline-secondary" size="sm" onClick={handleLogout}>
               <BsBoxArrowRight className="me-1" />
-              Salir
+              {t('logout')}
             </Button>
           </Nav>
         </BsNavbar.Collapse>

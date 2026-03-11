@@ -1,0 +1,10 @@
+{
+  "albumProgress": "Overall album progress",
+  "songs": "Songs",
+  "newSong": "New Song",
+  "noSongs": "No songs yet.",
+  "addFirstSong": "Add first song",
+  "songTitle": "Title",
+  "songTitlePlaceholder": "E.g.: Epic Intro",
+  "estimatedDate": "Estimated completion date (optional)"
+}

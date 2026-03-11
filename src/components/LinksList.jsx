@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form, InputGroup, Button, ListGroup } from 'react-bootstrap';
 import { BsPlusLg, BsTrash, BsLink45Deg, BsBoxArrowUpRight } from 'react-icons/bs';
 
 export default function LinksList({ links, onAdd, onDelete }) {
+  const { t } = useTranslation('components');
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
 
@@ -22,7 +24,7 @@ export default function LinksList({ links, onAdd, onDelete }) {
       <Form onSubmit={handleAdd} className="mb-3">
         <Form.Control
           size="sm"
-          placeholder="Nombre del enlace (opcional)"
+          placeholder={t('linksList.namePlaceholder')}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="mb-2"
@@ -30,7 +32,7 @@ export default function LinksList({ links, onAdd, onDelete }) {
         <InputGroup size="sm">
           <InputGroup.Text><BsLink45Deg /></InputGroup.Text>
           <Form.Control
-            placeholder="https://drive.google.com/..."
+            placeholder={t('linksList.urlPlaceholder')}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
@@ -41,7 +43,7 @@ export default function LinksList({ links, onAdd, onDelete }) {
       </Form>
 
       {links.length === 0 && (
-        <p className="text-secondary text-center small py-2 mb-0">No hay enlaces.</p>
+        <p className="text-secondary text-center small py-2 mb-0">{t('linksList.empty')}</p>
       )}
 
       <ListGroup variant="flush">

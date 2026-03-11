@@ -4,8 +4,10 @@ import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { BsMusicNoteBeamed } from 'react-icons/bs';
 import { useAuthContext } from '../hooks/useAuth';
 import { validatePassword } from '../utils/validators';
+import { useTranslation } from 'react-i18next';
 
 export default function Register() {
+  const { t } = useTranslation('auth');
   const { register } = useAuthContext();
   const navigate = useNavigate();
   const [name, setName] = useState('');
@@ -30,9 +32,9 @@ export default function Register() {
       navigate('/dashboard');
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
-        setError('Este email ya está registrado.');
+        setError(t('register.errorEmailInUse'));
       } else {
-        setError('Error al crear la cuenta. Inténtalo de nuevo.');
+        setError(t('register.errorGeneric'));
       }
     } finally {
       setLoading(false);
@@ -44,8 +46,8 @@ export default function Register() {
       <div style={{ maxWidth: 420, width: '100%' }}>
         <div className="text-center mb-4">
           <BsMusicNoteBeamed size={48} className="text-primary mb-2" />
-          <h2>Crear cuenta</h2>
-          <p className="text-muted">Regístrate para empezar a trackear tu álbum</p>
+          <h2>{t('register.title')}</h2>
+          <p className="text-muted">{t('register.subtitle')}</p>
         </div>
 
         <Card className="shadow-sm">
@@ -54,47 +56,47 @@ export default function Register() {
 
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
-                <Form.Label>Nombre</Form.Label>
+                <Form.Label>{t('register.name')}</Form.Label>
                 <Form.Control
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="Tu nombre"
+                  placeholder={t('register.namePlaceholder')}
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>{t('register.email')}</Form.Label>
                 <Form.Control
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="tu@email.com"
+                  placeholder={t('register.emailPlaceholder')}
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Contraseña</Form.Label>
+                <Form.Label>{t('register.password')}</Form.Label>
                 <Form.Control
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={t('register.passwordPlaceholder')}
                 />
               </Form.Group>
 
               <Button type="submit" variant="primary" className="w-100" disabled={loading}>
-                {loading ? 'Creando cuenta...' : 'Registrarse'}
+                {loading ? t('register.submitting') : t('register.submit')}
               </Button>
             </Form>
           </Card.Body>
         </Card>
 
         <p className="text-center mt-3 text-muted">
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+          {t('register.hasAccount')} <Link to="/login">{t('register.login')}</Link>
         </p>
       </div>
     </Container>

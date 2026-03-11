@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react';
 import { Button, ListGroup, Spinner, Alert } from 'react-bootstrap';
 import { BsCloudUpload, BsTrash, BsFileEarmarkMusic, BsFileEarmarkImage, BsDownload } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { formatFileSize } from '../utils/formatters';
 import AudioPlayer from './AudioPlayer';
 
 export default function FileUploader({ files, uploading, onUpload, onDelete }) {
+  const { t } = useTranslation('components');
   const inputRef = useRef(null);
   const [error, setError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
@@ -44,9 +46,9 @@ export default function FileUploader({ files, uploading, onUpload, onDelete }) {
           <>
             <BsCloudUpload size={32} className="text-muted mb-2 d-block mx-auto" />
             <p className="mb-0 text-muted">
-              Arrastra archivos aquí o haz clic para seleccionar
+              {t('fileUploader.dragOrClick')}
             </p>
-            <small className="text-muted">Audio (MP3, WAV, OGG, M4A) o imágenes (JPG, PNG, WebP)</small>
+            <small className="text-muted">{t('fileUploader.allowedFormats')}</small>
           </>
         )}
         <input
@@ -60,7 +62,7 @@ export default function FileUploader({ files, uploading, onUpload, onDelete }) {
       </div>
 
       {files.length === 0 && (
-        <p className="text-muted text-center">No hay archivos subidos.</p>
+        <p className="text-muted text-center">{t('fileUploader.noFiles')}</p>
       )}
 
       <ListGroup variant="flush">

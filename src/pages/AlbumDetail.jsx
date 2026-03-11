@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Modal, ProgressBar } from 'react-bootstrap';
 import { BsPlusLg, BsGearFill, BsArrowLeft } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { useSongs } from '../hooks/useSongs';
 import { useAlbums } from '../hooks/useAlbums';
 import SongCard from '../components/SongCard';
 
 export default function AlbumDetail() {
+  const { t } = useTranslation('albumDetail');
   const { albumId } = useParams();
   const { albums } = useAlbums();
   const { songs, loading, createSong } = useSongs(albumId);
@@ -29,7 +31,7 @@ export default function AlbumDetail() {
     setShowModal(false);
   }
 
-  if (!album) return <Container className="py-4"><p>Álbum no encontrado.</p></Container>;
+  if (!album) return <Container className="py-4"><p>{t('common:albumNotFound')}</p></Container>;
 
   return (
     <Container className="py-4">
@@ -45,27 +47,27 @@ export default function AlbumDetail() {
 
       <div className="mb-4">
         <div className="d-flex justify-content-between mb-1">
-          <small className="text-muted">Progreso general del álbum</small>
+          <small className="text-muted">{t('albumProgress')}</small>
           <small className="fw-semibold">{avgProgress}%</small>
         </div>
         <ProgressBar now={avgProgress} variant={avgProgress === 100 ? 'success' : 'primary'} style={{ height: 10 }} />
-        <small className="text-muted">{songs.length} canción{songs.length !== 1 ? 'es' : ''}</small>
+        <small className="text-muted">{t('common:songs', { count: songs.length })}</small>
       </div>
 
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Canciones</h5>
+        <h5 className="mb-0">{t('songs')}</h5>
         <Button variant="primary" size="sm" onClick={() => setShowModal(true)}>
           <BsPlusLg className="me-1" />
-          Nueva Canción
+          {t('newSong')}
         </Button>
       </div>
 
       {loading ? (
-        <p className="text-center text-muted">Cargando...</p>
+        <p className="text-center text-muted">{t('common:loading')}</p>
       ) : songs.length === 0 ? (
         <div className="text-center py-5">
-          <p className="text-muted">No hay canciones aún.</p>
-          <Button variant="primary" onClick={() => setShowModal(true)}>Agregar primera canción</Button>
+          <p className="text-muted">{t('noSongs')}</p>
+          <Button variant="primary" onClick={() => setShowModal(true)}>{t('addFirstSong')}</Button>
         </div>
       ) : (
         <Row xs={1} md={2} lg={3} className="g-3">
@@ -79,22 +81,22 @@ export default function AlbumDetail() {
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Nueva Canción</Modal.Title>
+          <Modal.Title>{t('newSong')}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleCreate}>
           <Modal.Body>
             <Form.Group className="mb-3">
-              <Form.Label>Título</Form.Label>
+              <Form.Label>{t('songTitle')}</Form.Label>
               <Form.Control
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Ej: Intro épica"
+                placeholder={t('songTitlePlaceholder')}
                 autoFocus
                 required
               />
             </Form.Group>
             <Form.Group>
-              <Form.Label>Fecha estimada de finalización (opcional)</Form.Label>
+              <Form.Label>{t('estimatedDate')}</Form.Label>
               <Form.Control
                 type="date"
                 value={estimatedDate}
@@ -103,8 +105,8 @@ export default function AlbumDetail() {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-            <Button type="submit" variant="primary" disabled={!newTitle.trim()}>Crear</Button>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>{t('common:cancel')}</Button>
+            <Button type="submit" variant="primary" disabled={!newTitle.trim()}>{t('common:create')}</Button>
           </Modal.Footer>
         </Form>
       </Modal>

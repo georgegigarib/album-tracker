@@ -1,0 +1,34 @@
+{
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "saving": "Guardando...",
+  "create": "Crear",
+  "delete": "Eliminar",
+  "confirm": "Confirmar",
+  "loading": "Cargando...",
+  "or": "o",
+  "add": "Agregar",
+  "albumNotFound": "Álbum no encontrado.",
+  "saveChanges": "Guardar cambios",
+  "overallProgress": "Progreso general",
+  "progress": "Progreso",
+  "songs_one": "{{count}} canción",
+  "songs_other": "{{count}} canciones",
+  "delivery": "Entrega",
+  "created": "Creada",
+  "info": "Info",
+  "general": "General",
+  "status": {
+    "label": "Estado",
+    "not_started": "Sin iniciar",
+    "in_progress": "En progreso",
+    "mixing": "En mezcla",
+    "done": "Terminada"
+  },
+  "stages": {
+    "recording": "Grabación",
+    "editing": "Edición",
+    "mixing_stage": "Mezcla",
+    "mastering": "Masterización"
+  }
+}

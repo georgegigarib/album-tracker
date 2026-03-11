@@ -1,0 +1,12 @@
+{
+  "clickToEdit": "Click para editar",
+  "deleteSong": "Eliminar canción",
+  "deleteTitle": "Eliminar canción",
+  "deleteMessage": "Se eliminará \"{{title}}\" con todas sus notas, subtareas y enlaces.",
+  "completed": "Completada",
+  "pending": "Pendiente",
+  "instruments": "Instrumentos",
+  "subtasks": "Subtareas",
+  "notes": "Notas",
+  "links": "Enlaces"
+}

@@ -1,0 +1,43 @@
+{
+  "subtaskList": {
+    "placeholder": "Nueva subtarea...",
+    "empty": "No hay subtareas."
+  },
+  "notesList": {
+    "placeholder": "Escribe una nota...",
+    "empty": "No hay notas aún."
+  },
+  "linksList": {
+    "namePlaceholder": "Nombre del enlace (opcional)",
+    "urlPlaceholder": "https://drive.google.com/...",
+    "empty": "No hay enlaces."
+  },
+  "fileUploader": {
+    "dragOrClick": "Arrastra archivos aquí o haz clic para seleccionar",
+    "allowedFormats": "Audio (MP3, WAV, OGG, M4A) o imágenes (JPG, PNG, WebP)",
+    "noFiles": "No hay archivos subidos."
+  },
+  "collaboratorManager": {
+    "emailPlaceholder": "Email del colaborador",
+    "invalidEmail": "Email inválido.",
+    "userNotFound": "No se encontró un usuario con ese email.",
+    "ownerAlreadyHasAccess": "El propietario ya tiene acceso.",
+    "alreadyCollaborator": "Este usuario ya es colaborador.",
+    "errorAdding": "Error al agregar colaborador.",
+    "noCollaborators": "No hay colaboradores aún.",
+    "noName": "Sin nombre"
+  },
+  "confirmModal": {
+    "defaultTitle": "Confirmar",
+    "defaultMessage": "¿Estás seguro?"
+  },
+  "audioPlayer": {
+    "notSupported": "Tu navegador no soporta el reproductor de audio."
+  },
+  "validation": {
+    "noFile": "No se seleccionó ningún archivo.",
+    "invalidType": "Tipo de archivo no permitido. Usa MP3, WAV, OGG, M4A, JPG, PNG o WebP.",
+    "audioTooLarge": "El archivo de audio excede el límite de 10 MB.",
+    "imageTooLarge": "La imagen excede el límite de 5 MB."
+  }
+}

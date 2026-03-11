@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Container, Row, Col, Card, Button, Form, Badge } from 'react-bootstrap';
 import { BsArrowLeft, BsCalendar3 } from 'react-icons/bs';
 import { useSongs } from '../hooks/useSongs';
@@ -13,6 +14,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { formatDate, getStatusLabel, getStatusVariant } from '../utils/formatters';
 
 export default function SongDetail() {
+  const { t } = useTranslation('songDetail');
   const { albumId, songId } = useParams();
   const navigate = useNavigate();
   const { albums } = useAlbums();
@@ -32,7 +34,7 @@ export default function SongDetail() {
   const song = songs.find((s) => s.id === songId);
 
   if (!album || !song) {
-    return <Container className="py-4"><p className="text-secondary">Cargando...</p></Container>;
+    return <Container className="py-4"><p className="text-secondary">{t('common:loading')}</p></Container>;
   }
 
   const percent = song.completionPercent ?? 0;
@@ -95,7 +97,7 @@ export default function SongDetail() {
               className="mb-0"
               style={{ cursor: 'pointer' }}
               onClick={() => { setTitleValue(song.title); setEditingTitle(true); }}
-              title="Click para editar"
+              title={t('clickToEdit')}
             >
               {song.title}
             </h3>
@@ -107,7 +109,7 @@ export default function SongDetail() {
       {/* Overall progress */}
       <div className="mb-2">
         <div className="d-flex justify-content-between mb-1">
-          <small className="text-secondary">Progreso general</small>
+          <small className="text-secondary">{t('common:overallProgress')}</small>
           <small className="fw-semibold">{percent}%</small>
         </div>
         <div className="progress" style={{ height: 8, borderRadius: 4 }}>
@@ -129,35 +131,35 @@ export default function SongDetail() {
         {/* Left sidebar */}
         <Col xs={12} lg={3}>
           <Card className="shadow-sm">
-            <Card.Header className="fw-semibold py-2">Info</Card.Header>
+            <Card.Header className="fw-semibold py-2">{t('common:info')}</Card.Header>
             <Card.Body className="py-2">
               <div className="mb-3">
-                <small className="text-secondary d-block mb-1">Estado</small>
+                <small className="text-secondary d-block mb-1">{t('common:status.label')}</small>
                 <Form.Select value={song.status} onChange={handleStatusChange} size="sm">
-                  <option value="not_started">Sin iniciar</option>
-                  <option value="in_progress">En progreso</option>
-                  <option value="mixing">En mezcla</option>
-                  <option value="done">Terminada</option>
+                  <option value="not_started">{t('common:status.not_started')}</option>
+                  <option value="in_progress">{t('common:status.in_progress')}</option>
+                  <option value="mixing">{t('common:status.mixing')}</option>
+                  <option value="done">{t('common:status.done')}</option>
                 </Form.Select>
               </div>
 
               <div className="mb-3">
                 <small className="text-secondary d-flex align-items-center gap-1">
-                  <BsCalendar3 /> Creada: {formatDate(song.createdAt)}
+                  <BsCalendar3 /> {t('common:created')}: {formatDate(song.createdAt)}
                 </small>
               </div>
 
               {song.estimatedEndDate && (
                 <div className="mb-3">
                   <small className="text-secondary d-flex align-items-center gap-1">
-                    <BsCalendar3 /> Entrega: {formatDate(song.estimatedEndDate)}
+                    <BsCalendar3 /> {t('common:delivery')}: {formatDate(song.estimatedEndDate)}
                   </small>
                 </div>
               )}
 
               <div className="text-center mt-3">
                 <Button variant="link" size="sm" className="text-secondary p-0" onClick={() => setShowDelete(true)}>
-                  Eliminar canción
+                  {t('deleteSong')}
                 </Button>
               </div>
             </Card.Body>
@@ -191,9 +193,9 @@ export default function SongDetail() {
 
       <ConfirmModal
         show={showDelete}
-        title="Eliminar cancion"
-        message={`Se eliminara "${song.title}" con todas sus notas, subtareas y enlaces.`}
-        confirmLabel="Eliminar"
+        title={t('deleteTitle')}
+        message={t('deleteMessage', { title: song.title })}
+        confirmLabel={t('common:delete')}
         onConfirm={handleDelete}
         onCancel={() => setShowDelete(false)}
       />
