@@ -1,0 +1,8 @@
+{
+  "title": "My Albums",
+  "newAlbum": "New Album",
+  "noAlbums": "You don't have any albums yet.",
+  "createFirst": "Create your first album",
+  "albumTitle": "Album title",
+  "albumTitlePlaceholder": "E.g.: My First Album"
+}

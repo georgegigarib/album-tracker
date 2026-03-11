@@ -1,0 +1,12 @@
+{
+  "clickToEdit": "Click to edit",
+  "deleteSong": "Delete song",
+  "deleteTitle": "Delete song",
+  "deleteMessage": "\"{{title}}\" will be deleted along with all its notes, subtasks, and links.",
+  "completed": "Completed",
+  "pending": "Pending",
+  "instruments": "Instruments",
+  "subtasks": "Subtasks",
+  "notes": "Notes",
+  "links": "Links"
+}

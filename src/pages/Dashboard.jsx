@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 import { BsPlusLg } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { useAlbums } from '../hooks/useAlbums';
 import { useSongs } from '../hooks/useSongs';
 import AlbumCard from '../components/AlbumCard';
@@ -16,6 +17,7 @@ function AlbumWithProgress({ album }) {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation('dashboard');
   const { albums, loading, createAlbum } = useAlbums();
   const [showModal, setShowModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -31,19 +33,19 @@ export default function Dashboard() {
   return (
     <Container className="py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3 className="mb-0">Mis Álbumes</h3>
+        <h3 className="mb-0">{t('title')}</h3>
         <Button variant="primary" onClick={() => setShowModal(true)}>
           <BsPlusLg className="me-1" />
-          Nuevo Álbum
+          {t('newAlbum')}
         </Button>
       </div>
 
       {loading ? (
-        <p className="text-center text-muted">Cargando...</p>
+        <p className="text-center text-muted">{t('common:loading')}</p>
       ) : albums.length === 0 ? (
         <div className="text-center py-5">
-          <p className="text-muted fs-5">No tienes álbumes aún.</p>
-          <Button variant="primary" onClick={() => setShowModal(true)}>Crear tu primer álbum</Button>
+          <p className="text-muted fs-5">{t('noAlbums')}</p>
+          <Button variant="primary" onClick={() => setShowModal(true)}>{t('createFirst')}</Button>
         </div>
       ) : (
         <Row xs={1} md={2} lg={3} className="g-3">
@@ -57,24 +59,24 @@ export default function Dashboard() {
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Nuevo Álbum</Modal.Title>
+          <Modal.Title>{t('newAlbum')}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleCreate}>
           <Modal.Body>
             <Form.Group>
-              <Form.Label>Título del álbum</Form.Label>
+              <Form.Label>{t('albumTitle')}</Form.Label>
               <Form.Control
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Ej: Mi Primer Álbum"
+                placeholder={t('albumTitlePlaceholder')}
                 autoFocus
                 required
               />
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>Cancelar</Button>
-            <Button type="submit" variant="primary" disabled={!newTitle.trim()}>Crear</Button>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>{t('common:cancel')}</Button>
+            <Button type="submit" variant="primary" disabled={!newTitle.trim()}>{t('common:create')}</Button>
           </Modal.Footer>
         </Form>
       </Modal>

@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { BsGoogle, BsMusicNoteBeamed } from 'react-icons/bs';
 import { useAuthContext } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation('auth');
   const { login, loginWithGoogle } = useAuthContext();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -20,7 +22,7 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch {
-      setError('Email o contraseña incorrectos.');
+      setError(t('login.errorInvalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -32,7 +34,7 @@ export default function Login() {
       await loginWithGoogle();
       navigate('/dashboard');
     } catch {
-      setError('Error al iniciar sesión con Google.');
+      setError(t('login.errorGoogle'));
     }
   }
 
@@ -41,8 +43,8 @@ export default function Login() {
       <div style={{ maxWidth: 420, width: '100%' }}>
         <div className="text-center mb-4">
           <BsMusicNoteBeamed size={48} className="text-primary mb-2" />
-          <h2>Album Tracker</h2>
-          <p className="text-muted">Inicia sesión para continuar</p>
+          <h2>{t('login.title')}</h2>
+          <p className="text-muted">{t('login.subtitle')}</p>
         </div>
 
         <Card className="shadow-sm">
@@ -51,45 +53,45 @@ export default function Login() {
 
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>{t('login.email')}</Form.Label>
                 <Form.Control
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="tu@email.com"
+                  placeholder={t('login.emailPlaceholder')}
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Contraseña</Form.Label>
+                <Form.Label>{t('login.password')}</Form.Label>
                 <Form.Control
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="••••••"
+                  placeholder={t('login.passwordPlaceholder')}
                 />
               </Form.Group>
 
               <Button type="submit" variant="primary" className="w-100 mb-3" disabled={loading}>
-                {loading ? 'Ingresando...' : 'Iniciar sesión'}
+                {loading ? t('login.submitting') : t('login.submit')}
               </Button>
             </Form>
 
             <div className="text-center mb-3">
-              <span className="text-muted">o</span>
+              <span className="text-muted">{t('common:or')}</span>
             </div>
 
             <Button variant="outline-dark" className="w-100 d-flex align-items-center justify-content-center gap-2" onClick={handleGoogle}>
               <BsGoogle />
-              Continuar con Google
+              {t('login.continueWithGoogle')}
             </Button>
           </Card.Body>
         </Card>
 
         <p className="text-center mt-3 text-muted">
-          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+          {t('login.noAccount')} <Link to="/register">{t('login.register')}</Link>
         </p>
       </div>
     </Container>

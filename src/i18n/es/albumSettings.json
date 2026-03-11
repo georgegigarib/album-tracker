@@ -1,0 +1,11 @@
+{
+  "title": "Configuración del álbum",
+  "albumTitle": "Título del álbum",
+  "collaborators": "Colaboradores",
+  "onlyOwnerCanManage": "Solo el propietario puede gestionar colaboradores.",
+  "dangerZone": "Zona de peligro",
+  "deleteWarning": "Eliminar el álbum borrará todas las canciones, notas y archivos.",
+  "deleteAlbum": "Eliminar álbum",
+  "deleteTitle": "Eliminar álbum",
+  "deleteMessage": "¿Estás seguro de eliminar \"{{title}}\"? Esta acción no se puede deshacer."
+}

@@ -1,0 +1,43 @@
+{
+  "subtaskList": {
+    "placeholder": "New subtask...",
+    "empty": "No subtasks."
+  },
+  "notesList": {
+    "placeholder": "Write a note...",
+    "empty": "No notes yet."
+  },
+  "linksList": {
+    "namePlaceholder": "Link name (optional)",
+    "urlPlaceholder": "https://drive.google.com/...",
+    "empty": "No links."
+  },
+  "fileUploader": {
+    "dragOrClick": "Drag files here or click to select",
+    "allowedFormats": "Audio (MP3, WAV, OGG, M4A) or images (JPG, PNG, WebP)",
+    "noFiles": "No files uploaded."
+  },
+  "collaboratorManager": {
+    "emailPlaceholder": "Collaborator email",
+    "invalidEmail": "Invalid email.",
+    "userNotFound": "No user found with that email.",
+    "ownerAlreadyHasAccess": "The owner already has access.",
+    "alreadyCollaborator": "This user is already a collaborator.",
+    "errorAdding": "Error adding collaborator.",
+    "noCollaborators": "No collaborators yet.",
+    "noName": "No name"
+  },
+  "confirmModal": {
+    "defaultTitle": "Confirm",
+    "defaultMessage": "Are you sure?"
+  },
+  "audioPlayer": {
+    "notSupported": "Your browser does not support the audio player."
+  },
+  "validation": {
+    "noFile": "No file selected.",
+    "invalidType": "File type not allowed. Use MP3, WAV, OGG, M4A, JPG, PNG or WebP.",
+    "audioTooLarge": "Audio file exceeds the 10 MB limit.",
+    "imageTooLarge": "Image exceeds the 5 MB limit."
+  }
+}

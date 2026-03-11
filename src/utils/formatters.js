@@ -1,7 +1,9 @@
+import i18n from '../i18n/i18n';
+
 export function formatDate(timestamp) {
   if (!timestamp) return '—';
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-  return date.toLocaleDateString('es-ES', {
+  return date.toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -24,13 +26,7 @@ export function calcCompletionPercent(progress) {
 }
 
 export function getStatusLabel(status) {
-  const labels = {
-    not_started: 'Sin iniciar',
-    in_progress: 'En progreso',
-    mixing: 'En mezcla',
-    done: 'Terminada',
-  };
-  return labels[status] || status;
+  return i18n.t(`common:status.${status}`, { defaultValue: status });
 }
 
 export function getStatusVariant(status) {
@@ -43,15 +39,8 @@ export function getStatusVariant(status) {
   return variants[status] || 'secondary';
 }
 
-const STAGE_LABELS = {
-  recording: 'Grabación',
-  editing: 'Edición',
-  mixing_stage: 'Mezcla',
-  mastering: 'Masterización',
-};
-
 export function getStageLabel(stageKey) {
-  return STAGE_LABELS[stageKey] || stageKey;
+  return i18n.t(`common:stages.${stageKey}`, { defaultValue: stageKey });
 }
 
 export function calcOverallProgress(stages, stageProgress) {

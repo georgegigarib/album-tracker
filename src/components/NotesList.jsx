@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Form, InputGroup } from 'react-bootstrap';
 import { BsTrash, BsPencil, BsCheck, BsX, BsSend } from 'react-icons/bs';
 import { formatDate } from '../utils/formatters';
 
 export default function NotesList({ notes, onAdd, onUpdate, onDelete }) {
+  const { t } = useTranslation('components');
   const [newNote, setNewNote] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
@@ -37,7 +39,7 @@ export default function NotesList({ notes, onAdd, onUpdate, onDelete }) {
       <Form onSubmit={handleAdd} className="mb-3">
         <InputGroup>
           <Form.Control
-            placeholder="Escribe una nota..."
+            placeholder={t('notesList.placeholder')}
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
           />
@@ -48,7 +50,7 @@ export default function NotesList({ notes, onAdd, onUpdate, onDelete }) {
       </Form>
 
       {notes.length === 0 && (
-        <p className="text-muted text-center py-3">No hay notas aún.</p>
+        <p className="text-muted text-center py-3">{t('notesList.empty')}</p>
       )}
 
       {notes.map((note) => (

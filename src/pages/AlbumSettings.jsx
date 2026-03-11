@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAlbums } from '../hooks/useAlbums';
 import { useAuthContext } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import CollaboratorManager from '../components/CollaboratorManager';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -14,6 +15,7 @@ export default function AlbumSettings() {
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const { albums, updateAlbum, deleteAlbum, addCollaborator, removeCollaborator } = useAlbums();
+  const { t } = useTranslation('albumSettings');
   const [titleOverride, setTitleOverride] = useState(null);
   const [showDelete, setShowDelete] = useState(false);
   const [collaboratorUsers, setCollaboratorUsers] = useState([]);
@@ -59,7 +61,7 @@ export default function AlbumSettings() {
     await removeCollaborator(albumId, uid);
   }
 
-  if (!album) return <Container className="py-4"><p>Álbum no encontrado.</p></Container>;
+  if (!album) return <Container className="py-4"><p>{t('common:albumNotFound')}</p></Container>;
 
   return (
     <Container className="py-4" style={{ maxWidth: 720 }}>
@@ -67,17 +69,17 @@ export default function AlbumSettings() {
         <Button as={Link} to={`/albums/${albumId}`} variant="link" className="p-0 text-muted">
           <BsArrowLeft size={20} />
         </Button>
-        <h3 className="mb-0">Configuración del álbum</h3>
+        <h3 className="mb-0">{t('title')}</h3>
       </div>
 
       <Row className="g-4">
         <Col xs={12}>
           <Card className="shadow-sm">
-            <Card.Header className="fw-semibold">General</Card.Header>
+            <Card.Header className="fw-semibold">{t('common:general')}</Card.Header>
             <Card.Body>
               <Form onSubmit={handleSaveTitle}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Título del álbum</Form.Label>
+                  <Form.Label>{t('albumTitle')}</Form.Label>
                   <Form.Control
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -86,7 +88,7 @@ export default function AlbumSettings() {
                 </Form.Group>
                 {isOwner && (
                   <Button type="submit" variant="primary" size="sm" disabled={!title.trim()}>
-                    Guardar cambios
+                    {t('common:saveChanges')}
                   </Button>
                 )}
               </Form>
@@ -96,7 +98,7 @@ export default function AlbumSettings() {
 
         <Col xs={12}>
           <Card className="shadow-sm">
-            <Card.Header className="fw-semibold">Colaboradores</Card.Header>
+            <Card.Header className="fw-semibold">{t('collaborators')}</Card.Header>
             <Card.Body>
               {isOwner ? (
                 <CollaboratorManager
@@ -107,7 +109,7 @@ export default function AlbumSettings() {
                 />
               ) : (
                 <div>
-                  <p className="text-muted">Solo el propietario puede gestionar colaboradores.</p>
+                  <p className="text-muted">{t('onlyOwnerCanManage')}</p>
                   {collaboratorUsers.map((c) => (
                     <div key={c.uid} className="mb-1">
                       {c.displayName || c.email}
@@ -122,11 +124,11 @@ export default function AlbumSettings() {
         {isOwner && (
           <Col xs={12}>
             <Card className="shadow-sm border-danger">
-              <Card.Header className="fw-semibold text-danger">Zona de peligro</Card.Header>
+              <Card.Header className="fw-semibold text-danger">{t('dangerZone')}</Card.Header>
               <Card.Body>
-                <p className="text-muted mb-2">Eliminar el álbum borrará todas las canciones, notas y archivos.</p>
+                <p className="text-muted mb-2">{t('deleteWarning')}</p>
                 <Button variant="danger" onClick={() => setShowDelete(true)}>
-                  <BsTrash className="me-1" /> Eliminar álbum
+                  <BsTrash className="me-1" /> {t('deleteAlbum')}
                 </Button>
               </Card.Body>
             </Card>
@@ -136,9 +138,9 @@ export default function AlbumSettings() {
 
       <ConfirmModal
         show={showDelete}
-        title="Eliminar álbum"
-        message={`¿Estás seguro de eliminar "${album.title}"? Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
+        title={t('deleteTitle')}
+        message={t('deleteMessage', { title: album.title })}
+        confirmLabel={t('common:delete')}
         onConfirm={handleDelete}
         onCancel={() => setShowDelete(false)}
       />

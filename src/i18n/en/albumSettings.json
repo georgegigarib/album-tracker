@@ -1,0 +1,11 @@
+{
+  "title": "Album settings",
+  "albumTitle": "Album title",
+  "collaborators": "Collaborators",
+  "onlyOwnerCanManage": "Only the owner can manage collaborators.",
+  "dangerZone": "Danger zone",
+  "deleteWarning": "Deleting the album will remove all songs, notes, and files.",
+  "deleteAlbum": "Delete album",
+  "deleteTitle": "Delete album",
+  "deleteMessage": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+}

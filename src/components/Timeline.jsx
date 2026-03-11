@@ -1,9 +1,10 @@
 import { BsCheckCircleFill, BsCircle } from 'react-icons/bs';
-import { getStageLabel } from '../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 const STAGE_ORDER = ['recording', 'editing', 'mixing_stage', 'mastering'];
 
 export default function Timeline({ stages, activeStage, onSelectStage }) {
+  const { t } = useTranslation();
   if (!stages) return null;
 
   return (
@@ -28,7 +29,7 @@ export default function Timeline({ stages, activeStage, onSelectStage }) {
                 <BsCircle size={24} className={isActive ? 'text-primary' : 'text-secondary'} />
               )}
               <small className={`fw-semibold ${isActive ? 'text-primary' : isCompleted ? 'text-success' : 'text-secondary'}`}>
-                {getStageLabel(key)}
+                {t(`common:stages.${key}`)}
               </small>
             </button>
             {index < STAGE_ORDER.length - 1 && (

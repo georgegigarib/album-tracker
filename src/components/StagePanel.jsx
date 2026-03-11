@@ -1,5 +1,5 @@
 import { Card, Form } from 'react-bootstrap';
-import { getStageLabel } from '../utils/formatters';
+import { useTranslation } from 'react-i18next';
 import SubtaskList from './SubtaskList';
 import NotesList from './NotesList';
 import LinksList from './LinksList';
@@ -31,16 +31,17 @@ export default function StagePanel({
   onAddLink,
   onDeleteLink,
 }) {
+  const { t } = useTranslation('songDetail');
   const showInstruments = STAGES_WITH_INSTRUMENTS.includes(stageKey);
 
   return (
     <div>
       <div className="d-flex align-items-center gap-3 mb-3">
-        <h5 className="mb-0">{getStageLabel(stageKey)}</h5>
+        <h5 className="mb-0">{t(`common:stages.${stageKey}`)}</h5>
         <Form.Check
           type="switch"
           id={`stage-toggle-${stageKey}`}
-          label={stage?.completed ? 'Completada' : 'Pendiente'}
+          label={stage?.completed ? t('completed') : t('pending')}
           checked={stage?.completed || false}
           onChange={onToggleStage}
           className="ms-auto"
@@ -49,7 +50,7 @@ export default function StagePanel({
 
       {showInstruments && progress && (
         <Card className="shadow-sm mb-3">
-          <Card.Header className="fw-semibold py-2">Instrumentos</Card.Header>
+          <Card.Header className="fw-semibold py-2">{t('instruments')}</Card.Header>
           <Card.Body className="py-2">
             <InstrumentChecklist
               progress={progress}
@@ -62,7 +63,7 @@ export default function StagePanel({
       )}
 
       <Card className="shadow-sm mb-3">
-        <Card.Header className="fw-semibold py-2">Subtareas</Card.Header>
+        <Card.Header className="fw-semibold py-2">{t('subtasks')}</Card.Header>
         <Card.Body className="py-2">
           <SubtaskList
             subtasks={subtasks}
@@ -74,7 +75,7 @@ export default function StagePanel({
       </Card>
 
       <Card className="shadow-sm mb-3">
-        <Card.Header className="fw-semibold py-2">Notas</Card.Header>
+        <Card.Header className="fw-semibold py-2">{t('notes')}</Card.Header>
         <Card.Body className="py-2">
           <NotesList
             notes={notes}
@@ -86,7 +87,7 @@ export default function StagePanel({
       </Card>
 
       <Card className="shadow-sm">
-        <Card.Header className="fw-semibold py-2">Enlaces</Card.Header>
+        <Card.Header className="fw-semibold py-2">{t('links')}</Card.Header>
         <Card.Body className="py-2">
           <LinksList
             links={links}

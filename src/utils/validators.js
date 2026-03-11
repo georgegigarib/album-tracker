@@ -1,3 +1,5 @@
+import i18n from '../i18n/i18n';
+
 const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a'];
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_AUDIO_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -5,21 +7,21 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;  // 5 MB
 const MAX_SONG_STORAGE = 50 * 1024 * 1024; // 50 MB per song
 
 export function validateFile(file) {
-  if (!file) return { valid: false, error: 'No se seleccionó ningún archivo.' };
+  if (!file) return { valid: false, error: i18n.t('components:validation.noFile') };
 
   const isAudio = ALLOWED_AUDIO_TYPES.includes(file.type);
   const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
 
   if (!isAudio && !isImage) {
-    return { valid: false, error: 'Tipo de archivo no permitido. Usa MP3, WAV, OGG, M4A, JPG, PNG o WebP.' };
+    return { valid: false, error: i18n.t('components:validation.invalidType') };
   }
 
   if (isAudio && file.size > MAX_AUDIO_SIZE) {
-    return { valid: false, error: 'El archivo de audio excede el límite de 10 MB.' };
+    return { valid: false, error: i18n.t('components:validation.audioTooLarge') };
   }
 
   if (isImage && file.size > MAX_IMAGE_SIZE) {
-    return { valid: false, error: 'La imagen excede el límite de 5 MB.' };
+    return { valid: false, error: i18n.t('components:validation.imageTooLarge') };
   }
 
   return { valid: true, type: isAudio ? 'audio' : 'image' };
@@ -31,7 +33,7 @@ export function validateEmail(email) {
 }
 
 export function validatePassword(password) {
-  if (password.length < 6) return 'La contraseña debe tener al menos 6 caracteres.';
+  if (password.length < 6) return i18n.t('auth:validation.passwordMinLength');
   return null;
 }
 

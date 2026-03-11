@@ -1,9 +1,11 @@
 import { Card, ProgressBar } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { BsDisc, BsCalendar3, BsMusicNote } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils/formatters';
 
 export default function AlbumCard({ album, songsProgress, songCount }) {
+  const { t } = useTranslation();
   const progress = songsProgress ?? 0;
 
   return (
@@ -30,7 +32,7 @@ export default function AlbumCard({ album, songsProgress, songCount }) {
               {songCount != null && (
                 <small className="text-muted d-flex align-items-center gap-1">
                   <BsMusicNote />
-                  {songCount} cancion{songCount !== 1 ? 'es' : ''}
+                  {t('common:songs', { count: songCount })}
                 </small>
               )}
             </div>
@@ -38,7 +40,7 @@ export default function AlbumCard({ album, songsProgress, songCount }) {
         </div>
         <div className="mt-3">
           <div className="d-flex justify-content-between mb-1">
-            <small className="text-muted">Progreso general</small>
+            <small className="text-muted">{t('common:overallProgress')}</small>
             <small className="fw-semibold">{progress}%</small>
           </div>
           <ProgressBar
