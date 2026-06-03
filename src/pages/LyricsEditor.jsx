@@ -11,6 +11,7 @@ import { useLyrics } from '../hooks/useLyrics';
 import { useLinks } from '../hooks/useLinks';
 import { useSongs } from '../hooks/useSongs';
 import { useAuthContext } from '../hooks/useAuth';
+import { useTheme } from '../hooks/useTheme';
 import { getGoogleDriveFileId } from '../utils/formatters';
 import { driveAudioCache } from '../utils/driveAudioCache';
 import KaraokeView from '../components/KaraokeView';
@@ -71,6 +72,13 @@ export default function LyricsEditor() {
   // ── Live mode ─────────────────────────────────────────────────────────────
   const [liveInput, setLiveInput] = useState('');
   const liveListRef = useRef(null);
+
+  // ── Reset confirmation ────────────────────────────────────────────────────
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // ── Theme ─────────────────────────────────────────────────────────────────
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   // ── Scroll refs ───────────────────────────────────────────────────────────
   const syncLineRefs = useRef([]);
@@ -348,29 +356,76 @@ export default function LyricsEditor() {
   const syncedCount = workingLines.filter((l) => l.timestamp !== null).length;
   const syncComplete = syncIndex >= workingLines.length && hasLines;
   const hasSomeSync = syncedCount > 0;
-  // ── Shared audio player UI ────────────────────────────────────────────────
-  const editorSkipStyle = {
-    display: 'flex', alignItems: 'center', gap: 4,
-    background: 'rgba(255,255,255,0.1)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    borderRadius: 20, color: 'rgba(255,255,255,0.9)',
-    cursor: 'pointer', padding: '6px 12px', fontSize: 11, fontWeight: 600,
-    transition: 'background 0.15s',
-  };
+  // ── Link selector (custom styled pills) ─────────────────────────────────
+  function renderLinkSelector(inDark = false) {
+    if (driveLinks.length === 0) return null;
+    const txt = inDark ? 'rgba(255,255,255,0.5)' : 'var(--app-text-secondary)';
+    return (
+      <div className="d-flex align-items-center gap-2 flex-wrap mb-3">
+        <small style={{ color: txt, flexShrink: 0, fontSize: 11 }}>Demo:</small>
+        {driveLinks.map((l, idx) => {
+          const active = l.id === selectedLinkId;
+          return (
+            <button
+              key={l.id}
+              onClick={() => setSelectedLinkId(l.id)}
+              style={{
+                padding: '4px 13px', borderRadius: 20, cursor: 'pointer',
+                fontSize: 12, fontWeight: active ? 600 : 400,
+                transition: 'all 0.15s',
+                border: active
+                  ? '1.5px solid var(--app-accent)'
+                  : inDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid var(--app-border)',
+                background: active
+                  ? 'var(--app-accent)'
+                  : inDark ? 'rgba(255,255,255,0.07)' : 'var(--app-surface-2)',
+                color: active ? 'white' : inDark ? 'rgba(255,255,255,0.75)' : 'var(--app-text)',
+                display: 'flex', alignItems: 'center', gap: 5,
+              }}
+            >
+              <BsMusicNoteBeamed size={10} />
+              {l.title || `Demo ${idx + 1}`}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
 
-  function renderPlayer() {
+  // ── Shared audio player UI ────────────────────────────────────────────────
+  function renderPlayer(inDark = false) {
+    const onDark = inDark || isDark;
+    const skipStyle = {
+      display: 'flex', alignItems: 'center', gap: 4,
+      background: onDark ? 'rgba(255,255,255,0.1)' : 'var(--app-surface-3)',
+      border: onDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid var(--app-border)',
+      borderRadius: 20,
+      color: onDark ? 'rgba(255,255,255,0.9)' : 'var(--app-text)',
+      cursor: 'pointer', padding: '6px 13px', fontSize: 11, fontWeight: 600,
+      transition: 'background 0.15s',
+    };
+    const hoverBg = onDark ? 'rgba(255,255,255,0.18)' : 'var(--app-surface-2)';
+    const baseBg = onDark ? 'rgba(255,255,255,0.1)' : 'var(--app-surface-3)';
+
     return (
       <div
-        className="rounded-3 p-3 mb-3"
+        className="rounded-3 p-3"
         style={{
-          background: 'linear-gradient(135deg, #0f0c29, #302b63)',
-          color: 'white',
+          background: inDark
+            ? 'rgba(0,0,0,0.25)'
+            : isDark
+              ? 'linear-gradient(135deg, #0f0c29, #302b63)'
+              : 'var(--app-surface-2)',
+          border: inDark
+            ? '1px solid rgba(255,255,255,0.08)'
+            : isDark ? 'none' : '1px solid var(--app-border)',
+          color: onDark ? 'white' : 'var(--app-text)',
         }}
       >
         {audioLoading && (
-          <div className="d-flex align-items-center gap-2">
-            <Spinner size="sm" style={{ color: 'white' }} />
-            <small style={{ opacity: 0.6 }}>Descargando audio...</small>
+          <div className="d-flex align-items-center justify-content-center gap-2 py-1">
+            <Spinner size="sm" style={{ color: onDark ? 'white' : undefined }} />
+            <small style={{ opacity: 0.6 }}>Descargando audio…</small>
           </div>
         )}
         {audioError && (
@@ -380,59 +435,51 @@ export default function LyricsEditor() {
               : `Error: ${audioError}`}
           </small>
         )}
-        {!selectedFileId && !audioLoading && (
-          <small style={{ opacity: 0.5 }}>
-            Sin audio seleccionado — selecciona un demo en la pestaña Escribir.
+        {!selectedFileId && !audioLoading && !audioError && (
+          <small style={{ opacity: 0.45 }}>
+            Sin audio seleccionado — elige un demo arriba.
           </small>
         )}
         {blobUrl && (
-          <div>
-            <div className="d-flex align-items-center gap-2 mb-2">
+          <>
+            {/* Centered controls */}
+            <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
               <button
                 onClick={() => skip(-5)}
-                style={editorSkipStyle}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+                style={skipStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = baseBg; }}
               >
-                <BsArrowCounterclockwise size={13} />
-                <span>5s</span>
+                <BsArrowCounterclockwise size={13} /><span>5s</span>
               </button>
               <button
                 onClick={togglePlay}
                 style={{
-                  width: 44, height: 44, borderRadius: '50%',
+                  width: 46, height: 46, borderRadius: '50%',
                   background: '#1DB954', border: 'none', color: 'white',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(29,185,84,0.35)',
-                  flexShrink: 0,
+                  cursor: 'pointer', flexShrink: 0,
+                  boxShadow: '0 4px 14px rgba(29,185,84,0.4)',
+                  transition: 'transform 0.1s',
                 }}
+                onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.94)'; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
               >
                 {playing
-                  ? <BsPauseFill size={18} />
-                  : <BsPlayFill size={18} style={{ marginLeft: 2 }} />}
+                  ? <BsPauseFill size={20} />
+                  : <BsPlayFill size={20} style={{ marginLeft: 2 }} />}
               </button>
               <button
                 onClick={() => skip(5)}
-                style={editorSkipStyle}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+                style={skipStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = baseBg; }}
               >
-                <span>5s</span>
-                <BsArrowClockwise size={13} />
+                <span>5s</span><BsArrowClockwise size={13} />
               </button>
-              <span
-                className="ms-auto"
-                style={{
-                  fontSize: 12, opacity: 0.55,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
             </div>
 
-            {/* Waveform scrubber */}
+            {/* Waveform */}
             <WaveformScrubber
               blobUrl={blobUrl}
               currentTime={currentTime}
@@ -440,8 +487,19 @@ export default function LyricsEditor() {
               playing={playing}
               onSeek={handleSeek}
               height={44}
+              colorPlayed="#1DB954"
+              colorUnplayed={onDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'}
             />
-          </div>
+
+            {/* Time row */}
+            <div
+              className="d-flex justify-content-between mt-1"
+              style={{ fontSize: 11, opacity: 0.5, fontVariantNumeric: 'tabular-nums' }}
+            >
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+          </>
         )}
       </div>
     );
@@ -607,34 +665,18 @@ export default function LyricsEditor() {
         <div
           className="rounded-4 overflow-hidden d-flex flex-column"
           style={{
-            background: 'linear-gradient(180deg, #06060f 0%, #0d0921 100%)',
+            background: isDark
+              ? 'linear-gradient(180deg, #06060f 0%, #0d0921 100%)'
+              : 'var(--app-surface)',
+            border: isDark ? 'none' : '1px solid var(--app-border)',
             height: 'calc(100vh - 210px)',
             maxHeight: 720,
-            color: 'white',
+            color: isDark ? 'white' : 'var(--app-text)',
           }}
         >
-          {/* ── Audio selector + player ────────────────────────────────── */}
-          <div style={{ padding: '16px 16px 0', flexShrink: 0 }}>
-            {driveLinks.length > 1 && (
-              <select
-                value={selectedLinkId}
-                onChange={(e) => setSelectedLinkId(e.target.value)}
-                style={{
-                  width: '100%', marginBottom: 10,
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: 8, color: 'white',
-                  padding: '6px 10px', fontSize: 13,
-                }}
-              >
-                <option value="">Sin audio</option>
-                {driveLinks.map((l) => (
-                  <option key={l.id} value={l.id} style={{ background: '#1a1a2e' }}>
-                    {l.title || l.url}
-                  </option>
-                ))}
-              </select>
-            )}
+          {/* ── Header: link selector ──────────────────────────────────── */}
+          <div style={{ padding: '14px 16px 0', flexShrink: 0 }}>
+            {renderLinkSelector(true)}
             {!selectedFileId && driveLinks.length === 0 && (
               <div
                 style={{
@@ -654,7 +696,6 @@ export default function LyricsEditor() {
                 </span>.
               </div>
             )}
-            {renderPlayer()}
           </div>
 
           {/* ── Lines list ─────────────────────────────────────────────── */}
@@ -676,8 +717,8 @@ export default function LyricsEditor() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '9px 12px', marginBottom: 6,
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: isDark ? 'rgba(255,255,255,0.05)' : 'var(--app-surface-2)',
+                    border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid var(--app-border)',
                     borderRadius: 12,
                   }}
                 >
@@ -723,12 +764,17 @@ export default function LyricsEditor() {
             )}
           </div>
 
+          {/* ── Player — below lines so hand stays near input ──────────── */}
+          <div style={{ padding: '0 14px', flexShrink: 0 }}>
+            {renderPlayer(true)}
+          </div>
+
           {/* ── Input bar ──────────────────────────────────────────────── */}
           <div
             style={{
               flexShrink: 0, padding: '12px 14px 16px',
-              borderTop: '1px solid rgba(255,255,255,0.07)',
-              background: 'rgba(0,0,0,0.35)',
+              borderTop: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid var(--app-border)',
+              background: isDark ? 'rgba(0,0,0,0.35)' : 'var(--app-surface-2)',
               backdropFilter: 'blur(10px)',
             }}
           >
@@ -742,9 +788,9 @@ export default function LyricsEditor() {
                 autoComplete="off"
                 style={{
                   flex: 1, resize: 'none', outline: 'none',
-                  background: 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  borderRadius: 12, color: 'white',
+                  background: isDark ? 'rgba(255,255,255,0.07)' : 'var(--app-surface)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid var(--app-border)',
+                  borderRadius: 12, color: isDark ? 'white' : 'var(--app-text)',
                   padding: '10px 14px', fontSize: 15, lineHeight: 1.5,
                   fontFamily: 'inherit',
                   transition: 'border-color 0.15s',
@@ -859,8 +905,8 @@ export default function LyricsEditor() {
             </Alert>
           )}
 
-          {/* Player */}
-          {renderPlayer()}
+          {/* Link selector */}
+          {renderLinkSelector()}
 
           {hasLines && (
             <>
@@ -995,8 +1041,13 @@ export default function LyricsEditor() {
                 )}
               </div>
 
+              {/* Player — below lines so mouse stays near the Mark button */}
+              <div className="mt-3 mb-3">
+                {renderPlayer()}
+              </div>
+
               {/* Action bar */}
-              <div className="mt-3">
+              <div>
                 <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                   <div style={{ fontSize: 13 }}>
                     {syncComplete ? (
@@ -1013,19 +1064,38 @@ export default function LyricsEditor() {
                       </span>
                     )}
                   </div>
-                  <div className="d-flex gap-2">
-                    <button
-                      onClick={handleResetSync}
-                      style={{
-                        background: 'none', border: 'none',
-                        color: 'var(--bs-secondary-color)',
-                        fontSize: 13, cursor: 'pointer', padding: '4px 8px',
-                        borderRadius: 8,
-                      }}
-                    >
-                      ↺ Reiniciar
-                    </button>
-                    {!syncComplete && (
+                  <div className="d-flex gap-2 align-items-center">
+                    {/* Reset with inline confirmation */}
+                    {showResetConfirm ? (
+                      <div className="d-flex align-items-center gap-2">
+                        <small className="text-secondary">¿Borrar todos los timestamps?</small>
+                        <Button
+                          size="sm" variant="danger"
+                          onClick={() => { handleResetSync(); setShowResetConfirm(false); }}
+                        >
+                          Sí, reiniciar
+                        </Button>
+                        <Button
+                          size="sm" variant="outline-secondary"
+                          onClick={() => setShowResetConfirm(false)}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowResetConfirm(true)}
+                        style={{
+                          background: 'none', border: 'none',
+                          color: 'var(--bs-secondary-color)',
+                          fontSize: 13, cursor: 'pointer', padding: '4px 8px',
+                          borderRadius: 8,
+                        }}
+                      >
+                        ↺ Reiniciar
+                      </button>
+                    )}
+                    {!syncComplete && !showResetConfirm && (
                       <Button size="sm" variant="outline-secondary" onClick={handleSkipLine}>
                         Saltar →
                       </Button>
@@ -1155,29 +1225,35 @@ export default function LyricsEditor() {
             <div
               className="rounded-4 overflow-hidden"
               style={{
-                background: 'linear-gradient(180deg, #06060f 0%, #0d0921 45%, #12082a 100%)',
+                background: isDark
+                  ? 'linear-gradient(180deg, #06060f 0%, #0d0921 45%, #12082a 100%)'
+                  : 'var(--app-surface)',
+                border: isDark ? 'none' : '1px solid var(--app-border)',
                 height: 'calc(100vh - 200px)',
                 maxHeight: 700,
                 display: 'flex',
                 flexDirection: 'column',
               }}
             >
-              {/* Player inside the dark card */}
-              {selectedFileId && (
-                <div style={{ padding: '20px 24px 0', flexShrink: 0 }}>
-                  {renderPlayer()}
-                </div>
-              )}
-
-              {!hasSomeSync && (
-                <div style={{ padding: '0 24px 12px' }}>
+              {/* Lyrics — Apple Music style */}
+              <div
+                className="hide-scrollbar"
+                ref={(el) => { viewLineRefs._container = el; }}
+                style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  overscrollBehavior: 'contain',
+                  padding: 'clamp(24px, 5vw, 48px) clamp(20px, 6vw, 60px) 10vh',
+                  position: 'relative',
+                }}
+              >
+                {!hasSomeSync && (
                   <div
-                    className="rounded-3 d-flex align-items-center gap-2"
+                    className="rounded-3 d-flex align-items-center gap-2 mb-4"
                     style={{
                       background: 'rgba(255,255,255,0.06)',
                       border: '1px solid rgba(255,255,255,0.1)',
-                      padding: '10px 14px',
-                      fontSize: 13,
+                      padding: '10px 14px', fontSize: 13,
                       color: 'rgba(255,255,255,0.55)',
                     }}
                   >
@@ -1193,21 +1269,7 @@ export default function LyricsEditor() {
                       {' '}para ver el karaoke en tiempo real.
                     </span>
                   </div>
-                </div>
-              )}
-
-              {/* Lyrics — Apple Music style */}
-              <div
-                className="hide-scrollbar"
-                ref={(el) => { viewLineRefs._container = el; }}
-                style={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  overscrollBehavior: 'contain',
-                  padding: 'clamp(24px, 5vw, 48px) clamp(20px, 6vw, 60px) 45vh',
-                  position: 'relative',
-                }}
-              >
+                )}
                 {workingLines.map((line, i) => {
                   const isActive = i === activeLineIndex;
                   const dist = i - activeLineIndex;
@@ -1246,7 +1308,7 @@ export default function LyricsEditor() {
                           : 'clamp(12px, 2vw, 20px)',
                         opacity,
                         transition: 'opacity 0.45s ease, font-size 0.35s ease',
-                        color: 'white',
+                        color: isDark ? 'white' : 'var(--app-text)',
                         letterSpacing: isActive ? 0.4 : 0,
                         userSelect: 'none',
                         cursor: line.timestamp !== null ? 'pointer' : 'default',
@@ -1256,6 +1318,18 @@ export default function LyricsEditor() {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Player — at the bottom */}
+              <div
+                style={{
+                  flexShrink: 0, padding: '10px 16px 16px',
+                  borderTop: '1px solid rgba(255,255,255,0.07)',
+                  background: 'rgba(0,0,0,0.2)',
+                }}
+              >
+                {renderLinkSelector(true)}
+                {renderPlayer(true)}
               </div>
             </div>
           )}
