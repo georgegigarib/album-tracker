@@ -1026,43 +1026,33 @@ export default function LyricsEditor() {
                   </div>
                 </div>
 
-                <button
-                  onClick={syncComplete ? handleSaveSync : stampCurrentLine}
-                  disabled={
-                    saving ||
-                    (!syncComplete && (!blobUrl || syncIndex >= workingLines.length))
-                  }
-                  style={{
-                    width: '100%',
-                    height: 60,
-                    borderRadius: 16,
-                    border: 'none',
-                    fontSize: 15,
-                    fontWeight: 700,
-                    letterSpacing: 0.5,
-                    cursor: saving || (!syncComplete && !blobUrl) ? 'not-allowed' : 'pointer',
-                    opacity: saving || (!syncComplete && !blobUrl) ? 0.5 : 1,
-                    color: 'white',
-                    background: syncComplete
-                      ? 'linear-gradient(135deg, #198754, #20c997)'
-                      : 'linear-gradient(135deg, #0d6efd, #6f42c1)',
-                    boxShadow: syncComplete
-                      ? '0 4px 20px rgba(25,135,84,0.38)'
-                      : '0 4px 20px rgba(13,110,253,0.38)',
-                    transition: 'opacity 0.2s, transform 0.1s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 10,
-                  }}
-                  onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
-                  onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
-                >
-                  {saving ? (
-                    <Spinner size="sm" style={{ color: 'white' }} />
-                  ) : syncComplete ? (
-                    '💾 Guardar sincronización'
-                  ) : (
+                {/* Mark verse button — only while there are lines left to stamp */}
+                {!syncComplete && (
+                  <button
+                    onClick={stampCurrentLine}
+                    disabled={saving || !blobUrl || syncIndex >= workingLines.length}
+                    style={{
+                      width: '100%',
+                      height: 60,
+                      borderRadius: 16,
+                      border: 'none',
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: 0.5,
+                      cursor: !blobUrl ? 'not-allowed' : 'pointer',
+                      opacity: !blobUrl ? 0.5 : 1,
+                      color: 'white',
+                      background: 'linear-gradient(135deg, #0d6efd, #6f42c1)',
+                      boxShadow: '0 4px 20px rgba(13,110,253,0.38)',
+                      transition: 'opacity 0.2s, transform 0.1s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 10,
+                    }}
+                    onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
+                    onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
                     <>
                       <span>⏺ MARCAR VERSO</span>
                       <span
@@ -1072,8 +1062,46 @@ export default function LyricsEditor() {
                         · Espacio
                       </span>
                     </>
-                  )}
-                </button>
+                  </button>
+                )}
+
+                {/* Save button — always visible once at least one line is stamped */}
+                {hasSomeSync && (
+                  <button
+                    onClick={handleSaveSync}
+                    disabled={saving}
+                    style={{
+                      width: '100%',
+                      height: syncComplete ? 60 : 44,
+                      borderRadius: 16,
+                      border: 'none',
+                      fontSize: syncComplete ? 15 : 14,
+                      fontWeight: 600,
+                      cursor: saving ? 'wait' : 'pointer',
+                      opacity: saving ? 0.7 : 1,
+                      color: 'white',
+                      background: syncComplete
+                        ? 'linear-gradient(135deg, #198754, #20c997)'
+                        : 'rgba(25,135,84,0.18)',
+                      border: syncComplete ? 'none' : '1px solid rgba(25,135,84,0.4)',
+                      boxShadow: syncComplete ? '0 4px 20px rgba(25,135,84,0.38)' : 'none',
+                      transition: 'opacity 0.2s, transform 0.1s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      marginTop: syncComplete ? 0 : 8,
+                    }}
+                    onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
+                    onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
+                    {saving
+                      ? <Spinner size="sm" style={{ color: 'white' }} />
+                      : syncComplete
+                        ? '💾 Guardar sincronización'
+                        : `💾 Guardar (${syncedCount}/${workingLines.length} versos)`}
+                  </button>
+                )}
 
                 {!blobUrl && selectedFileId && !audioLoading && !audioError && (
                   <small className="text-secondary d-block text-center mt-2">
