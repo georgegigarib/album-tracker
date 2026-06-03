@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { BsXLg, BsMusicNoteBeamed, BsPlayFill, BsPauseFill } from 'react-icons/bs';
+import { BsXLg, BsMusicNoteBeamed, BsPlayFill, BsPauseFill, BsArrowCounterclockwise, BsArrowClockwise } from 'react-icons/bs';
 import WaveformScrubber from './WaveformScrubber';
 
 function formatTime(seconds) {
@@ -33,6 +33,15 @@ export default function KaraokeView({
 
   const hasSomeSync = lines.some((l) => l.timestamp !== null);
   const hasControls = onTogglePlay || onSeek;
+
+  const karaokeSkipStyle = {
+    display: 'flex', alignItems: 'center', gap: 5,
+    background: 'rgba(255,255,255,0.1)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 20, color: 'rgba(255,255,255,0.9)',
+    cursor: 'pointer', padding: '7px 14px',
+    transition: 'background 0.15s',
+  };
 
   // Last line whose timestamp is ≤ currentTime
   const activeIndex = lines.reduce((active, line, i) => {
@@ -217,16 +226,15 @@ export default function KaraokeView({
           </div>
 
           {/* Controls row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
             <button
-              onClick={() => onSkip && onSkip(-10)}
-              style={{
-                background: 'none', border: 'none',
-                color: 'rgba(255,255,255,0.65)',
-                fontSize: 13, cursor: 'pointer', padding: '4px 8px',
-              }}
+              onClick={() => onSkip && onSkip(-5)}
+              style={karaokeSkipStyle}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
             >
-              −10s
+              <BsArrowCounterclockwise size={14} />
+              <span style={{ fontSize: 11, fontWeight: 600 }}>5s</span>
             </button>
 
             <button
@@ -247,14 +255,13 @@ export default function KaraokeView({
             </button>
 
             <button
-              onClick={() => onSkip && onSkip(10)}
-              style={{
-                background: 'none', border: 'none',
-                color: 'rgba(255,255,255,0.65)',
-                fontSize: 13, cursor: 'pointer', padding: '4px 8px',
-              }}
+              onClick={() => onSkip && onSkip(5)}
+              style={karaokeSkipStyle}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
             >
-              +10s
+              <span style={{ fontSize: 11, fontWeight: 600 }}>5s</span>
+              <BsArrowClockwise size={14} />
             </button>
           </div>
 

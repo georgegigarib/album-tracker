@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
-import { BsPlayFill, BsPauseFill } from 'react-icons/bs';
+import { BsPlayFill, BsPauseFill, BsArrowCounterclockwise, BsArrowClockwise } from 'react-icons/bs';
 import { useAuthContext } from '../hooks/useAuth';
 import { driveAudioCache } from '../utils/driveAudioCache';
 
@@ -122,17 +122,17 @@ export default function DriveAudioPlayer({ fileId }) {
             <Button
               size="sm"
               variant="outline-secondary"
-              className="px-2 py-0 lh-1"
-              style={{ fontSize: 11 }}
-              onClick={() => skip(-10)}
+              className="d-flex align-items-center gap-1 px-2"
+              style={{ fontSize: 11, borderRadius: 20 }}
+              onClick={() => skip(-5)}
             >
-              −10s
+              <BsArrowCounterclockwise size={12} /> 5s
             </Button>
             <Button
               size="sm"
               variant="primary"
               className="d-flex align-items-center justify-content-center p-1"
-              style={{ width: 30, height: 30 }}
+              style={{ width: 30, height: 30, borderRadius: '50%' }}
               onClick={togglePlay}
             >
               {playing ? <BsPauseFill size={14} /> : <BsPlayFill size={14} />}
@@ -140,11 +140,11 @@ export default function DriveAudioPlayer({ fileId }) {
             <Button
               size="sm"
               variant="outline-secondary"
-              className="px-2 py-0 lh-1"
-              style={{ fontSize: 11 }}
-              onClick={() => skip(10)}
+              className="d-flex align-items-center gap-1 px-2"
+              style={{ fontSize: 11, borderRadius: 20 }}
+              onClick={() => skip(5)}
             >
-              +10s
+              5s <BsArrowClockwise size={12} />
             </Button>
             <span className="small text-secondary ms-1" style={{ minWidth: 80, fontVariantNumeric: 'tabular-nums' }}>
               {formatTime(currentTime)} / {formatTime(duration)}

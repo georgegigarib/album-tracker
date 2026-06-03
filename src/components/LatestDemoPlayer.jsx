@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Badge, Spinner } from 'react-bootstrap';
-import { BsPlayFill, BsPauseFill, BsMusicNoteBeamed } from 'react-icons/bs';
+import { BsPlayFill, BsPauseFill, BsMusicNoteBeamed, BsArrowCounterclockwise, BsArrowClockwise } from 'react-icons/bs';
 import { useAuthContext } from '../hooks/useAuth';
 import { useLyrics } from '../hooks/useLyrics';
 import { driveAudioCache } from '../utils/driveAudioCache';
@@ -28,6 +28,15 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
 
   const syncedLines = lyrics?.lines?.filter((l) => l.timestamp !== null) ?? [];
   const hasKaraoke = syncedLines.length > 0;
+
+  const skipBtnStyle = {
+    display: 'flex', alignItems: 'center', gap: 5,
+    background: 'rgba(255,255,255,0.1)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 20, color: 'rgba(255,255,255,0.9)',
+    cursor: 'pointer', padding: '7px 14px',
+    transition: 'background 0.15s',
+  };
 
   useEffect(() => {
     if (driveAudioCache.has(fileId)) {
@@ -161,12 +170,15 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
         </div>
 
         {/* Controls */}
-        <div className="d-flex align-items-center justify-content-center gap-4 mb-4">
+        <div className="d-flex align-items-center justify-content-center gap-3 mb-4">
           <button
-            onClick={() => skip(-10)}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: 12, padding: '4px 8px' }}
+            onClick={() => skip(-5)}
+            style={skipBtnStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
           >
-            −10s
+            <BsArrowCounterclockwise size={15} />
+            <span style={{ fontSize: 11, fontWeight: 600 }}>5s</span>
           </button>
 
           <button
@@ -198,10 +210,13 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
           </button>
 
           <button
-            onClick={() => skip(10)}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: 12, padding: '4px 8px' }}
+            onClick={() => skip(5)}
+            style={skipBtnStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
           >
-            +10s
+            <span style={{ fontSize: 11, fontWeight: 600 }}>5s</span>
+            <BsArrowClockwise size={15} />
           </button>
         </div>
 

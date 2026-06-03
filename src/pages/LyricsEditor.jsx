@@ -5,7 +5,7 @@ import {
 } from 'react-bootstrap';
 import {
   BsArrowLeft, BsMusicNoteBeamed, BsPlayFill, BsPauseFill,
-  BsCheck2Circle, BsExclamationTriangle,
+  BsCheck2Circle, BsExclamationTriangle, BsArrowCounterclockwise, BsArrowClockwise,
 } from 'react-icons/bs';
 import { useLyrics } from '../hooks/useLyrics';
 import { useLinks } from '../hooks/useLinks';
@@ -349,6 +349,15 @@ export default function LyricsEditor() {
   const syncComplete = syncIndex >= workingLines.length && hasLines;
   const hasSomeSync = syncedCount > 0;
   // ── Shared audio player UI ────────────────────────────────────────────────
+  const editorSkipStyle = {
+    display: 'flex', alignItems: 'center', gap: 4,
+    background: 'rgba(255,255,255,0.1)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 20, color: 'rgba(255,255,255,0.9)',
+    cursor: 'pointer', padding: '6px 12px', fontSize: 11, fontWeight: 600,
+    transition: 'background 0.15s',
+  };
+
   function renderPlayer() {
     return (
       <div
@@ -378,16 +387,15 @@ export default function LyricsEditor() {
         )}
         {blobUrl && (
           <div>
-            <div className="d-flex align-items-center gap-3 mb-2">
+            <div className="d-flex align-items-center gap-2 mb-2">
               <button
-                onClick={() => skip(-10)}
-                style={{
-                  background: 'none', border: 'none',
-                  color: 'rgba(255,255,255,0.65)', fontSize: 11,
-                  cursor: 'pointer', padding: '4px 6px',
-                }}
+                onClick={() => skip(-5)}
+                style={editorSkipStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
               >
-                −10s
+                <BsArrowCounterclockwise size={13} />
+                <span>5s</span>
               </button>
               <button
                 onClick={togglePlay}
@@ -405,14 +413,13 @@ export default function LyricsEditor() {
                   : <BsPlayFill size={18} style={{ marginLeft: 2 }} />}
               </button>
               <button
-                onClick={() => skip(10)}
-                style={{
-                  background: 'none', border: 'none',
-                  color: 'rgba(255,255,255,0.65)', fontSize: 11,
-                  cursor: 'pointer', padding: '4px 6px',
-                }}
+                onClick={() => skip(5)}
+                style={editorSkipStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
               >
-                +10s
+                <span>5s</span>
+                <BsArrowClockwise size={13} />
               </button>
               <span
                 className="ms-auto"
