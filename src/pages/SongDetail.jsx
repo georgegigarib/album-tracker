@@ -12,6 +12,7 @@ import Timeline from '../components/Timeline';
 import StagePanel from '../components/StagePanel';
 import ConfirmModal from '../components/ConfirmModal';
 import LatestDemoPlayer from '../components/LatestDemoPlayer';
+import LyricsWidget from '../components/LyricsWidget';
 import { formatDate, getStatusLabel, getStatusVariant, getGoogleDriveFileId } from '../utils/formatters';
 
 export default function SongDetail() {
@@ -128,6 +129,8 @@ export default function SongDetail() {
           fileId={getGoogleDriveFileId(latestDemo.url)}
           linkTitle={latestDemo.title}
           songTitle={song.title}
+          albumId={albumId}
+          songId={songId}
         />
       )}
 
@@ -175,6 +178,8 @@ export default function SongDetail() {
               </div>
             </Card.Body>
           </Card>
+
+          <LyricsWidget albumId={albumId} songId={songId} />
         </Col>
 
         {/* Right content */}

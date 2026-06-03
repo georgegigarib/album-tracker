@@ -244,6 +244,17 @@ body {
   border-radius: 3px;
 }
 
+/* ── Karaoke / hide scrollbar ── */
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Misc ── */
 
 .text-secondary {

@@ -42,9 +42,13 @@ album-tracker/
 │   │   ├── AudioPlayer.jsx           # Reproductor de audio HTML5
 │   │   ├── CollaboratorManager.jsx   # Gestion de colaboradores del album
 │   │   ├── ConfirmModal.jsx          # Modal generico de confirmacion
+│   │   ├── DriveAudioPlayer.jsx      # Reproductor inline para links de Google Drive
 │   │   ├── FileUploader.jsx          # Upload y lista de archivos
 │   │   ├── InstrumentChecklist.jsx   # Checklist de instrumentos por fase
-│   │   ├── LinksList.jsx             # Lista de enlaces por fase
+│   │   ├── KaraokeView.jsx           # Overlay fullscreen estilo Apple Music con letra sincronizada
+│   │   ├── LatestDemoPlayer.jsx      # Widget de demo mas reciente con player personalizado
+│   │   ├── LinksList.jsx             # Lista de enlaces por fase (con flag de latest demo)
+│   │   ├── LyricsWidget.jsx          # Widget sidebar con resumen y link al editor de letras
 │   │   ├── Navbar.jsx                # Barra de navegacion superior
 │   │   ├── NotesList.jsx             # Notas por fase
 │   │   ├── PrivateRoute.jsx          # Wrapper de ruta autenticada
@@ -53,9 +57,9 @@ album-tracker/
 │   │   ├── SubtaskList.jsx           # Lista de subtareas por fase
 │   │   └── Timeline.jsx              # Timeline horizontal de fases
 │   ├── config/
-│   │   └── firebase.js               # Inicializacion Firebase
+│   │   └── firebase.js               # Inicializacion Firebase (+ scope drive.readonly)
 │   ├── context/
-│   │   ├── AuthContext.jsx            # Provider de autenticacion
+│   │   ├── AuthContext.jsx            # Provider de autenticacion (+ googleAccessToken)
 │   │   ├── authContextValue.js        # createContext (split por react-refresh)
 │   │   ├── ThemeContext.jsx           # Provider de tema claro/oscuro
 │   │   └── themeContextValue.js       # createContext del tema
@@ -63,7 +67,8 @@ album-tracker/
 │   │   ├── useAlbums.js              # CRUD de albumes
 │   │   ├── useAuth.js                # Hook de autenticacion
 │   │   ├── useFiles.js               # Upload/delete de archivos
-│   │   ├── useLinks.js               # CRUD de enlaces
+│   │   ├── useLinks.js               # CRUD de enlaces (+ setLatestDemo con writeBatch)
+│   │   ├── useLyrics.js              # CRUD de letras sincronizadas por cancion
 │   │   ├── useNotes.js               # CRUD de notas
 │   │   ├── useSongs.js               # CRUD de canciones + instrumentos + fases
 │   │   ├── useSubtasks.js            # CRUD de subtareas
@@ -73,11 +78,13 @@ album-tracker/
 │   │   ├── AlbumSettings.jsx         # Configuracion del album
 │   │   ├── Dashboard.jsx             # Pagina principal con albumes
 │   │   ├── Login.jsx                 # Inicio de sesion
+│   │   ├── LyricsEditor.jsx          # Editor de letras con modos: Escribir / Sincronizar / Ver
 │   │   ├── Profile.jsx               # Perfil de usuario
 │   │   ├── Register.jsx              # Registro de cuenta
 │   │   └── SongDetail.jsx            # Detalle de cancion (fases, progreso, etc.)
 │   ├── utils/
-│   │   ├── formatters.js             # Formateadores y calculo de progreso
+│   │   ├── driveAudioCache.js        # Cache de blob URLs de audio de Google Drive (Map global)
+│   │   ├── formatters.js             # Formateadores, progreso y utils de Google Drive URL
 │   │   ├── instruments.js            # Diccionario de instrumentos
 │   │   └── validators.js             # Validaciones de archivos, email, password
 │   ├── App.jsx                       # Componente raiz con rutas
@@ -173,8 +180,22 @@ links/{linkId}
   title: string
   url: string
   stageKey: string
+  isLatestDemo: boolean  // solo uno puede ser true por cancion (writeBatch atomico)
   createdBy: string (uid)
   createdAt: Timestamp
+```
+
+### Subcoleccion: `songs/{songId}/lyrics`
+```
+lyrics/main  (documento unico por cancion)
+  rawText: string                  // texto crudo del editor (una linea = un verso)
+  lines: Array<{
+    text: string
+    timestamp: number | null       // segundos desde inicio del audio, null = sin sincronizar
+  }>
+  linkedLinkId: string | null      // ID del link de Drive asociado a la sincronizacion
+  linkedLinkDuration: number | null // duracion del audio al momento de sincronizar (para detectar cambios)
+  updatedAt: Timestamp
 ```
 
 ### Subcoleccion: `songs/{songId}/files`
@@ -195,9 +216,61 @@ files/{fileId}
 - **Provider**: Firebase Auth
 - **Metodos**: email/password, Google (popup)
 - **Contexto**: `AuthContext.jsx` envuelve toda la app
-- **Hook**: `useAuthContext()` retorna `{ user, loading, register, login, loginWithGoogle, logout }`
+- **Hook**: `useAuthContext()` retorna `{ user, loading, register, login, loginWithGoogle, logout, googleAccessToken }`
 - **Proteccion de rutas**: `PrivateRoute` redirige a `/login` si no autenticado
 - **Patron split**: `authContextValue.js` exporta el `createContext` separado para cumplir con `react-refresh/only-export-components`
+- **Google OAuth token**: Al hacer login con Google, se captura `GoogleAuthProvider.credentialFromResult(result).accessToken` y se guarda en `sessionStorage` con expiración de 1 hora. Se expone como `googleAccessToken` en el contexto para autenticar llamadas a la Google Drive API v3.
+
+## Sistema de Reproductor de Audio (Google Drive)
+
+El audio de Google Drive **no se puede embeber directamente** (CORS). El flujo es:
+
+1. El usuario agrega un link de Google Drive a una cancion
+2. Al abrir el player, se descarga el archivo como Blob via `GET /drive/v3/files/{fileId}?alt=media` con `Authorization: Bearer {googleAccessToken}`
+3. Se crea un `objectURL` del Blob y se usa como `src` del elemento `<audio>`
+4. El Blob URL se cachea en `driveAudioCache` (Map global de modulo) para reutilizar sin re-descargar
+
+**Requisitos en Google Cloud Console**:
+- Google Drive API habilitada en el proyecto
+- OAuth consent screen configurado con el usuario como test user (mientras la app no este verificada)
+- Scope `drive.readonly` agregado al GoogleAuthProvider de Firebase
+
+### `driveAudioCache` (`utils/driveAudioCache.js`)
+- `Map` global a nivel de modulo — persiste mientras el tab este abierto
+- Clave: `fileId` de Google Drive, Valor: `blob://...` URL
+- Compartido entre `LatestDemoPlayer`, `DriveAudioPlayer` y `LyricsEditor`
+
+### Demo mas reciente (`isLatestDemo`)
+- Cada cancion puede tener **un solo** link marcado como demo mas reciente
+- `useLinks.setLatestDemo(linkId)` usa `writeBatch` para limpiar todos los `isLatestDemo` de la cancion y marcar solo el seleccionado (operacion atomica)
+- `SongDetail` busca `allLinks.find(l => l.isLatestDemo)` y renderiza `LatestDemoPlayer` si el link tiene un fileId de Drive valido
+
+## Sistema de Letras (Lyrics)
+
+Editor de letras en 3 modos accesible desde `/albums/:albumId/songs/:songId/lyrics`.
+
+### Modos
+| Modo | Descripcion |
+|---|---|
+| **Escribir** | Textarea libre, una linea = un verso. Seleccion del demo de audio asociado. Al guardar, preserva timestamps existentes por texto coincidente. |
+| **Sincronizar** | Reproduce el audio y el usuario marca cada verso con Espacio (desktop) o boton grande (mobile). Muestra lista de versos con card activo resaltado en gradiente. Detecta si el audio cambio de duracion respecto al guardado. |
+| **Ver** | Vista karaoke Apple Music-style: contenedor oscuro de altura fija, letra con opacidad progresiva segun distancia al verso activo, auto-scroll al 35% del contenedor, click en verso para saltar al timestamp. |
+
+### `KaraokeView` (overlay fullscreen)
+- Se abre desde `LatestDemoPlayer` cuando la cancion tiene versos sincronizados
+- `position: fixed; inset: 0; z-index: 1060`
+- Fondo: gradiente oscuro `#06060f → #0d0921 → #12082a`
+- Opacidad progresiva: activo=1, ±1=0.38, ±2=0.18, resto=0.08
+- Auto-scroll al 35% del contenedor con `scrollTo({ behavior: 'smooth' })`
+- Click en verso → seek al `timestamp` del verso
+- Barra de controles en el fondo: play/pause, ±10s, seek bar, tiempo actual/total
+- Evita scroll del body mientras esta abierto (`document.body.style.overflow = 'hidden'`)
+
+### `useLyrics(albumId, songId)`
+| Funcion | Parametros | Descripcion |
+|---|---|---|
+| `saveLyrics` | `{ rawText, lines, linkedLinkId, linkedLinkDuration }` | `setDoc` en `lyrics/main` con merge |
+- Escucha `onSnapshot` en `albums/{albumId}/songs/{songId}/lyrics/main`
 
 ## Sistema de Fases (Timeline)
 
@@ -356,6 +429,7 @@ guitars (Guitarras), bass (Bajo), drums (Bateria), vocals (Voces)
 | addLink | (title, url, stageKey?) | Crea enlace (con null check de user) |
 | updateLink | (linkId, data) | Edita enlace |
 | deleteLink | (linkId) | Elimina enlace |
+| setLatestDemo | (linkId) | Marca un link como demo mas reciente (writeBatch atomico: limpia todos, marca uno) |
 
 ### `useFiles(albumId, songId)`
 | Funcion | Parametros | Descripcion |
@@ -374,6 +448,8 @@ guitars (Guitarras), bass (Bajo), drums (Bateria), vocals (Voces)
 - `getStatusVariant(status)` — Variante Bootstrap para badge de estado
 - `getStageLabel(stageKey)` — Label en espanol para fases
 - `calcOverallProgress(stages, stageProgress)` — Progreso total combinando fases + instrumentos de todas las fases
+- `getGoogleDriveFileId(url)` — Extrae el fileId de URLs `/file/d/{id}/` o `?id={id}` de Google Drive
+- `getGoogleDriveEmbedUrl(url)` — Retorna URL de preview de Drive (`/preview`)
 
 ### `validators.js`
 - `validateFile(file)` — Valida tipo MIME y tamano de archivos audio/imagen
@@ -395,6 +471,7 @@ albums/{albumId}   → read: miembro | create: sera owner | update: miembro | de
     files/         → read/write: miembro del album padre
     subtasks/      → read/write: miembro del album padre
     links/         → read/write: miembro del album padre
+    lyrics/        → read/write: miembro del album padre
 ```
 
 La membresía se verifica con `request.auth.uid in resource.data.members` (albums) o via `get()` del album padre (subcolecciones).
@@ -437,6 +514,7 @@ bun run preview   # Preview del build
 | `/dashboard` | Dashboard | Si |
 | `/albums/:albumId` | AlbumDetail | Si |
 | `/albums/:albumId/songs/:songId` | SongDetail | Si |
+| `/albums/:albumId/songs/:songId/lyrics` | LyricsEditor | Si |
 | `/albums/:albumId/settings` | AlbumSettings | Si |
 | `/profile` | Profile | Si |
 | `*` | Redirect a /dashboard | — |
