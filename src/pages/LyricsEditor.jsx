@@ -68,6 +68,10 @@ export default function LyricsEditor() {
   const [duration, setDuration] = useState(0);
   const [durationMismatch, setDurationMismatch] = useState(false);
 
+  // ── Live mode ─────────────────────────────────────────────────────────────
+  const [liveInput, setLiveInput] = useState('');
+  const liveListRef = useRef(null);
+
   // ── Scroll refs ───────────────────────────────────────────────────────────
   const syncLineRefs = useRef([]);
   const viewLineRefs = useRef([]);
@@ -186,6 +190,52 @@ export default function LyricsEditor() {
   function handleResetSync() {
     setWorkingLines((prev) => prev.map((l) => ({ ...l, timestamp: null })));
     setSyncIndex(0);
+  }
+
+  // ── Live mode actions ─────────────────────────────────────────────────────
+  function stampLiveLine() {
+    const text = liveInput.trim();
+    if (!text) return;
+    const t = audioRef.current?.currentTime ?? null;
+    setWorkingLines((prev) => [...prev, { text, timestamp: t }]);
+    setLiveInput('');
+    setTimeout(() => {
+      liveListRef.current?.scrollTo({ top: liveListRef.current.scrollHeight, behavior: 'smooth' });
+    }, 50);
+  }
+
+  function handleLiveKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      stampLiveLine();
+    }
+  }
+
+  function handleRestamp(index) {
+    const t = audioRef.current?.currentTime ?? null;
+    setWorkingLines((prev) => prev.map((l, i) => (i === index ? { ...l, timestamp: t } : l)));
+  }
+
+  function handleDeleteLiveLine(index) {
+    setWorkingLines((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleLiveFinish() {
+    if (workingLines.length === 0) return;
+    setSaving(true);
+    try {
+      const textForRaw = workingLines.map((l) => l.text).join('\n');
+      await saveLyrics({
+        rawText: textForRaw,
+        lines: workingLines,
+        linkedLinkId: selectedLinkId || null,
+        linkedLinkDuration: duration > 0 ? duration : (lyrics?.linkedLinkDuration ?? null),
+      });
+      setSyncIndex(0);
+      setMode('sync');
+    } finally {
+      setSaving(false);
+    }
   }
 
   function jumpToLine(index) {
@@ -448,6 +498,7 @@ export default function LyricsEditor() {
       >
         {[
           { key: 'write', label: '✏️ Escribir' },
+          { key: 'live', label: '✍️ En vivo' },
           { key: 'sync', label: '⏱ Sincronizar' },
           { key: 'view', label: '👁 Ver' },
         ].map(({ key, label }) => (
@@ -533,6 +584,203 @@ export default function LyricsEditor() {
             </Button>
           </Card.Body>
         </Card>
+      )}
+
+      {/* ═══ LIVE MODE ════════════════════════════════════════════════════ */}
+      {mode === 'live' && (
+        <div
+          className="rounded-4 overflow-hidden d-flex flex-column"
+          style={{
+            background: 'linear-gradient(180deg, #06060f 0%, #0d0921 100%)',
+            height: 'calc(100vh - 210px)',
+            maxHeight: 720,
+            color: 'white',
+          }}
+        >
+          {/* ── Audio selector + player ────────────────────────────────── */}
+          <div style={{ padding: '16px 16px 0', flexShrink: 0 }}>
+            {driveLinks.length > 1 && (
+              <select
+                value={selectedLinkId}
+                onChange={(e) => setSelectedLinkId(e.target.value)}
+                style={{
+                  width: '100%', marginBottom: 10,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 8, color: 'white',
+                  padding: '6px 10px', fontSize: 13,
+                }}
+              >
+                <option value="">Sin audio</option>
+                {driveLinks.map((l) => (
+                  <option key={l.id} value={l.id} style={{ background: '#1a1a2e' }}>
+                    {l.title || l.url}
+                  </option>
+                ))}
+              </select>
+            )}
+            {!selectedFileId && driveLinks.length === 0 && (
+              <div
+                style={{
+                  marginBottom: 10, padding: '10px 14px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 10, fontSize: 13,
+                  color: 'rgba(255,255,255,0.45)',
+                }}
+              >
+                Sin demo de audio. Agrégalo en la pestaña{' '}
+                <span
+                  style={{ textDecoration: 'underline', cursor: 'pointer', opacity: 0.85 }}
+                  onClick={() => setMode('write')}
+                >
+                  Escribir
+                </span>.
+              </div>
+            )}
+            {renderPlayer()}
+          </div>
+
+          {/* ── Lines list ─────────────────────────────────────────────── */}
+          <div
+            ref={liveListRef}
+            className="hide-scrollbar"
+            style={{ flex: 1, overflowY: 'auto', padding: '8px 14px' }}
+          >
+            {workingLines.length === 0 ? (
+              <div style={{ textAlign: 'center', paddingTop: 32, opacity: 0.25 }}>
+                <p style={{ margin: 0, fontSize: 14 }}>
+                  Reproduce el audio y escribe el primer verso abajo ↓
+                </p>
+              </div>
+            ) : (
+              workingLines.map((line, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '9px 12px', marginBottom: 6,
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 12,
+                  }}
+                >
+                  {/* Timestamp pill — tap to re-stamp */}
+                  <button
+                    onClick={() => handleRestamp(i)}
+                    title="Toca para estampar en el tiempo actual"
+                    style={{
+                      padding: '3px 9px', borderRadius: 20, flexShrink: 0,
+                      background: line.timestamp !== null
+                        ? 'rgba(29,185,84,0.18)' : 'rgba(255,255,255,0.06)',
+                      border: `1px solid ${line.timestamp !== null ? 'rgba(29,185,84,0.5)' : 'rgba(255,255,255,0.12)'}`,
+                      color: line.timestamp !== null ? '#1DB954' : 'rgba(255,255,255,0.35)',
+                      fontSize: 11, fontFamily: 'monospace', fontWeight: 600,
+                      cursor: 'pointer', transition: 'all 0.15s',
+                      minWidth: 44, textAlign: 'center',
+                    }}
+                  >
+                    {line.timestamp !== null ? formatTime(line.timestamp) : '—'}
+                  </button>
+
+                  {/* Line text */}
+                  <span style={{ flex: 1, fontSize: 14, lineHeight: 1.5, wordBreak: 'break-word' }}>
+                    {line.text}
+                  </span>
+
+                  {/* Delete */}
+                  <button
+                    onClick={() => handleDeleteLiveLine(i)}
+                    style={{
+                      background: 'none', border: 'none', flexShrink: 0,
+                      color: 'rgba(255,255,255,0.25)', cursor: 'pointer',
+                      fontSize: 18, lineHeight: 1, padding: '2px 6px',
+                      transition: 'color 0.15s',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(255,80,80,0.7)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.25)'; }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ── Input bar ──────────────────────────────────────────────── */}
+          <div
+            style={{
+              flexShrink: 0, padding: '12px 14px 16px',
+              borderTop: '1px solid rgba(255,255,255,0.07)',
+              background: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', marginBottom: 10 }}>
+              <textarea
+                value={liveInput}
+                onChange={(e) => setLiveInput(e.target.value)}
+                onKeyDown={handleLiveKeyDown}
+                placeholder="Escribe un verso… Enter para capturar"
+                rows={2}
+                autoComplete="off"
+                style={{
+                  flex: 1, resize: 'none', outline: 'none',
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  borderRadius: 12, color: 'white',
+                  padding: '10px 14px', fontSize: 15, lineHeight: 1.5,
+                  fontFamily: 'inherit',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
+              />
+              {/* Capture button (visible on mobile where Enter is less natural) */}
+              <button
+                onClick={stampLiveLine}
+                disabled={!liveInput.trim()}
+                style={{
+                  width: 50, height: 50, borderRadius: '50%', flexShrink: 0,
+                  background: liveInput.trim() ? '#1DB954' : 'rgba(255,255,255,0.08)',
+                  border: 'none', color: 'white', fontSize: 22,
+                  cursor: liveInput.trim() ? 'pointer' : 'default',
+                  transition: 'background 0.2s, transform 0.1s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: liveInput.trim() ? '0 4px 14px rgba(29,185,84,0.35)' : 'none',
+                }}
+                onMouseDown={(e) => { if (liveInput.trim()) e.currentTarget.style.transform = 'scale(0.93)'; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                ↵
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', flexShrink: 0 }}>
+                {workingLines.length === 0
+                  ? 'Captura versos al ritmo de la música'
+                  : `${workingLines.length} ${workingLines.length === 1 ? 'verso' : 'versos'} · toca el tiempo para re-estampar`}
+              </span>
+              {workingLines.length > 0 && (
+                <button
+                  onClick={handleLiveFinish}
+                  disabled={saving}
+                  style={{
+                    background: saving ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0d6efd, #6f42c1)',
+                    border: 'none', color: 'white',
+                    borderRadius: 20, padding: '7px 18px',
+                    fontSize: 13, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
+                    boxShadow: saving ? 'none' : '0 4px 14px rgba(13,110,253,0.3)',
+                    transition: 'all 0.2s', flexShrink: 0,
+                  }}
+                >
+                  {saving ? 'Guardando…' : 'Revisar sincronización →'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ═══ SYNC MODE ════════════════════════════════════════════════════ */}
