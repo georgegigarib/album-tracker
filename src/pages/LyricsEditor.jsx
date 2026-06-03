@@ -14,6 +14,7 @@ import { useAuthContext } from '../hooks/useAuth';
 import { getGoogleDriveFileId } from '../utils/formatters';
 import { driveAudioCache } from '../utils/driveAudioCache';
 import KaraokeView from '../components/KaraokeView';
+import WaveformScrubber from '../components/WaveformScrubber';
 
 function formatTime(s) {
   if (!s || isNaN(s) || s < 0) return '0:00';
@@ -162,8 +163,7 @@ export default function LyricsEditor() {
     );
   }
 
-  function handleSeek(e) {
-    const val = Number(e.target.value);
+  function handleSeek(val) {
     if (audioRef.current) audioRef.current.currentTime = val;
     setCurrentTime(val);
   }
@@ -289,8 +289,6 @@ export default function LyricsEditor() {
   const syncedCount = workingLines.filter((l) => l.timestamp !== null).length;
   const syncComplete = syncIndex >= workingLines.length && hasLines;
   const hasSomeSync = syncedCount > 0;
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-
   // ── Shared audio player UI ────────────────────────────────────────────────
   function renderPlayer() {
     return (
@@ -368,34 +366,15 @@ export default function LyricsEditor() {
               </span>
             </div>
 
-            {/* Seek bar */}
-            <div
-              style={{
-                position: 'relative', height: 4,
-                background: 'rgba(255,255,255,0.15)',
-                borderRadius: 2,
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute', left: 0, top: 0,
-                  height: '100%', width: `${progress}%`,
-                  background: '#1DB954', borderRadius: 2,
-                  transition: playing ? 'width 0.5s linear' : 'none',
-                  pointerEvents: 'none',
-                }}
-              />
-              <input
-                type="range"
-                min={0} max={duration || 0} step={0.5} value={currentTime}
-                onChange={handleSeek}
-                style={{
-                  position: 'absolute', inset: 0,
-                  width: '100%', opacity: 0,
-                  cursor: 'pointer', height: '100%', margin: 0,
-                }}
-              />
-            </div>
+            {/* Waveform scrubber */}
+            <WaveformScrubber
+              blobUrl={blobUrl}
+              currentTime={currentTime}
+              duration={duration}
+              playing={playing}
+              onSeek={handleSeek}
+              height={44}
+            />
           </div>
         )}
       </div>

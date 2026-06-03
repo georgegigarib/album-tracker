@@ -5,6 +5,7 @@ import { useAuthContext } from '../hooks/useAuth';
 import { useLyrics } from '../hooks/useLyrics';
 import { driveAudioCache } from '../utils/driveAudioCache';
 import KaraokeView from './KaraokeView';
+import WaveformScrubber from './WaveformScrubber';
 
 function formatTime(seconds) {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -74,8 +75,7 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
     audioRef.current.currentTime = Math.max(0, Math.min(duration, audioRef.current.currentTime + seconds));
   }
 
-  function handleSeek(e) {
-    const val = Number(e.target.value);
+  function handleSeek(val) {
     if (audioRef.current) audioRef.current.currentTime = val;
     setCurrentTime(val);
   }
@@ -93,11 +93,9 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
           playing={playing}
           songTitle={songTitle}
           onClose={() => setShowKaraoke(false)}
+          blobUrl={blobUrl}
           onTogglePlay={togglePlay}
-          onSeek={(val) => {
-            if (audioRef.current) audioRef.current.currentTime = val;
-            setCurrentTime(val);
-          }}
+          onSeek={handleSeek}
           onSkip={skip}
         />
       )}
@@ -207,29 +205,17 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
           </button>
         </div>
 
-        {/* Seek bar */}
+        {/* Waveform scrubber */}
         <div>
-          <div style={{ position: 'relative', height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 2, marginBottom: 8 }}>
-            <div
-              style={{
-                position: 'absolute', left: 0, top: 0,
-                height: '100%', width: `${progress}%`,
-                background: '#1DB954', borderRadius: 2,
-                transition: playing ? 'width 0.5s linear' : 'none',
-              }}
-            />
-            <input
-              type="range"
-              min={0} max={duration || 0} step={0.5} value={currentTime}
-              onChange={handleSeek}
-              style={{
-                position: 'absolute', inset: 0,
-                width: '100%', opacity: 0,
-                cursor: 'pointer', height: '100%', margin: 0,
-              }}
-            />
-          </div>
-          <div className="d-flex justify-content-between" style={{ fontSize: 12, opacity: 0.55, fontVariantNumeric: 'tabular-nums' }}>
+          <WaveformScrubber
+            blobUrl={blobUrl}
+            currentTime={currentTime}
+            duration={duration}
+            playing={playing}
+            onSeek={handleSeek}
+            height={52}
+          />
+          <div className="d-flex justify-content-between mt-2" style={{ fontSize: 12, opacity: 0.55, fontVariantNumeric: 'tabular-nums' }}>
             <span>{formatTime(currentTime)}</span>
             <span>{error ? <span style={{ color: '#ff6b6b' }}>Error: {error}</span> : formatTime(duration)}</span>
           </div>

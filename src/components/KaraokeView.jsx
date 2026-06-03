@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { BsXLg, BsMusicNoteBeamed, BsPlayFill, BsPauseFill } from 'react-icons/bs';
+import WaveformScrubber from './WaveformScrubber';
 
 function formatTime(seconds) {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -25,13 +26,12 @@ function formatTime(seconds) {
  */
 export default function KaraokeView({
   lines = [], currentTime = 0, duration = 0, playing = false,
-  songTitle = '', onClose, onTogglePlay, onSeek, onSkip,
+  songTitle = '', onClose, onTogglePlay, onSeek, onSkip, blobUrl = null,
 }) {
   const containerRef = useRef(null);
   const lineRefs = useRef([]);
 
   const hasSomeSync = lines.some((l) => l.timestamp !== null);
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const hasControls = onTogglePlay || onSeek;
 
   // Last line whose timestamp is ≤ currentTime
@@ -202,34 +202,17 @@ export default function KaraokeView({
             backdropFilter: 'blur(12px)',
           }}
         >
-          {/* Seek bar */}
-          <div
-            style={{
-              position: 'relative',
-              height: 3,
-              background: 'rgba(255,255,255,0.15)',
-              borderRadius: 2,
-              marginBottom: 14,
-            }}
-          >
-            <div
-              style={{
-                position: 'absolute', left: 0, top: 0,
-                height: '100%', width: `${progress}%`,
-                background: '#1DB954', borderRadius: 2,
-                transition: playing ? 'width 0.5s linear' : 'none',
-                pointerEvents: 'none',
-              }}
-            />
-            <input
-              type="range"
-              min={0} max={duration || 0} step={0.5} value={currentTime}
-              onChange={(e) => onSeek && onSeek(Number(e.target.value))}
-              style={{
-                position: 'absolute', inset: 0,
-                width: '100%', opacity: 0,
-                cursor: 'pointer', height: '100%', margin: 0,
-              }}
+          {/* Waveform scrubber */}
+          <div style={{ marginBottom: 14 }}>
+            <WaveformScrubber
+              blobUrl={blobUrl}
+              currentTime={currentTime}
+              duration={duration}
+              playing={playing}
+              onSeek={onSeek}
+              height={40}
+              colorPlayed="#1DB954"
+              colorUnplayed="rgba(255,255,255,0.2)"
             />
           </div>
 
