@@ -3,6 +3,7 @@ import { Badge, Spinner } from 'react-bootstrap';
 import { BsPlayFill, BsPauseFill, BsMusicNoteBeamed, BsArrowCounterclockwise, BsArrowClockwise } from 'react-icons/bs';
 import { useAuthContext } from '../hooks/useAuth';
 import { useLyrics } from '../hooks/useLyrics';
+import { useTheme } from '../hooks/useTheme';
 import { driveAudioCache } from '../utils/driveAudioCache';
 import KaraokeView from './KaraokeView';
 import WaveformScrubber from './WaveformScrubber';
@@ -17,6 +18,8 @@ function formatTime(seconds) {
 export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId, songId }) {
   const { googleAccessToken } = useAuthContext();
   const { lyrics } = useLyrics(albumId, songId);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const audioRef = useRef(null);
   const [blobUrl, setBlobUrl] = useState(() => driveAudioCache.get(fileId) || null);
   const [loading, setLoading] = useState(false);
@@ -31,12 +34,14 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
 
   const skipBtnStyle = {
     display: 'flex', alignItems: 'center', gap: 5,
-    background: 'rgba(255,255,255,0.1)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    borderRadius: 20, color: 'rgba(255,255,255,0.9)',
+    background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+    border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.12)',
+    borderRadius: 20, color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.75)',
     cursor: 'pointer', padding: '7px 14px',
     transition: 'background 0.15s',
   };
+  const skipHoverBg = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.12)';
+  const skipBaseBg  = isDark ? 'rgba(255,255,255,0.1)'  : 'rgba(0,0,0,0.06)';
 
   useEffect(() => {
     if (driveAudioCache.has(fileId)) {
@@ -112,9 +117,12 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
       <div
         className="rounded-3 mb-4 p-4"
         style={{
-          background: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
-          color: 'white',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          background: isDark
+            ? 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)'
+            : 'var(--app-surface)',
+          color: isDark ? 'white' : 'var(--app-text)',
+          boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.08)',
+          border: isDark ? 'none' : '1px solid var(--app-border)',
         }}
       >
         {blobUrl && (
@@ -131,7 +139,12 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
         <div className="d-flex align-items-start justify-content-between mb-3">
           <div>
             <Badge
-              style={{ background: 'rgba(255,255,255,0.15)', color: 'white', fontSize: 10, letterSpacing: 1 }}
+              style={{
+                background: isDark ? 'rgba(255,255,255,0.15)' : 'var(--app-surface-2)',
+                color: isDark ? 'white' : 'var(--app-text-secondary)',
+                fontSize: 10, letterSpacing: 1,
+                border: isDark ? 'none' : '1px solid var(--app-border)',
+              }}
               className="mb-2 fw-normal text-uppercase"
             >
               Latest Demo
@@ -145,9 +158,9 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
                 onClick={() => setShowKaraoke(true)}
                 title="Ver letra (karaoke)"
                 style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  color: 'white',
+                  background: isDark ? 'rgba(255,255,255,0.1)' : 'var(--app-surface-2)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid var(--app-border)',
+                  color: isDark ? 'white' : 'var(--app-text)',
                   borderRadius: 20,
                   padding: '4px 12px',
                   fontSize: 12,
@@ -158,8 +171,8 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
                   whiteSpace: 'nowrap',
                   transition: 'background 0.2s',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = skipHoverBg; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = skipBaseBg; }}
               >
                 <BsMusicNoteBeamed size={12} />
                 Letra
@@ -174,8 +187,8 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
           <button
             onClick={() => skip(-5)}
             style={skipBtnStyle}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = skipHoverBg; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = skipBaseBg; }}
           >
             <BsArrowCounterclockwise size={15} />
             <span style={{ fontSize: 11, fontWeight: 600 }}>5s</span>
@@ -185,15 +198,10 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
             onClick={togglePlay}
             disabled={!blobUrl}
             style={{
-              width: 60,
-              height: 60,
-              borderRadius: '50%',
-              background: blobUrl ? '#1DB954' : 'rgba(255,255,255,0.15)',
-              border: 'none',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: 60, height: 60, borderRadius: '50%',
+              background: blobUrl ? '#1DB954' : (isDark ? 'rgba(255,255,255,0.15)' : 'var(--app-surface-3)'),
+              border: 'none', color: 'white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: blobUrl ? 'pointer' : 'default',
               transition: 'transform 0.1s, background 0.2s',
               boxShadow: blobUrl ? '0 4px 15px rgba(29,185,84,0.4)' : 'none',
@@ -212,8 +220,8 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
           <button
             onClick={() => skip(5)}
             style={skipBtnStyle}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = skipHoverBg; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = skipBaseBg; }}
           >
             <span style={{ fontSize: 11, fontWeight: 600 }}>5s</span>
             <BsArrowClockwise size={15} />
@@ -229,8 +237,10 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
             playing={playing}
             onSeek={handleSeek}
             height={52}
+            colorPlayed="#1DB954"
+            colorUnplayed={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'}
           />
-          <div className="d-flex justify-content-between mt-2" style={{ fontSize: 12, opacity: 0.55, fontVariantNumeric: 'tabular-nums' }}>
+          <div className="d-flex justify-content-between mt-2" style={{ fontSize: 12, opacity: 0.55, fontVariantNumeric: 'tabular-nums', color: isDark ? 'white' : 'var(--app-text)' }}>
             <span>{formatTime(currentTime)}</span>
             <span>{error ? <span style={{ color: '#ff6b6b' }}>Error: {error}</span> : formatTime(duration)}</span>
           </div>

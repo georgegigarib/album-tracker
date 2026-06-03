@@ -272,6 +272,51 @@ Editor de letras en 3 modos accesible desde `/albums/:albumId/songs/:songId/lyri
 | `saveLyrics` | `{ rawText, lines, linkedLinkId, linkedLinkDuration }` | `setDoc` en `lyrics/main` con merge |
 - Escucha `onSnapshot` en `albums/{albumId}/songs/{songId}/lyrics/main`
 
+## Sistema de Audio — Waveform y Player
+
+### `WaveformScrubber` (`src/components/WaveformScrubber.jsx`)
+Scrubber estilo SoundCloud reutilizable en todos los players de la app.
+- Decodifica el audio con Web Audio API `AudioContext.decodeAudioData()` → calcula 180 picos normalizados de la primera pista
+- Renderiza en `<canvas>` con `devicePixelRatio` correcto (pantallas retina)
+- Cada barra se divide exactamente en el punto de progreso: jugado (verde `#1DB954`) / pendiente (configurable)
+- Click y drag para seeking libre; soporte touch para mobile
+- `peaksCache` (Map de modulo) comparte los datos decodificados — una sola decodificación por archivo por sesión
+- Props clave: `blobUrl`, `currentTime`, `duration`, `onSeek`, `colorPlayed`, `colorUnplayed`, `height`
+- Presente en: `LatestDemoPlayer`, `KaraokeView` (overlay), `LyricsEditor` (modos Sync/Live/Ver)
+
+### Botones de skip
+- ±5s en todos los players (antes ±10s)
+- Estilo pill redondeada con icono `BsArrowCounterclockwise` / `BsArrowClockwise` + label "5s"
+- Hover con fondo ligeramente más claro; targets de toque adecuados para mobile
+
+### Adaptación de tema (dark / light)
+`LatestDemoPlayer` y `LyricsEditor` usan `useTheme()` para adaptar colores dinámicamente:
+- **Dark**: fondos con gradiente oscuro, texto blanco, botones con `rgba(255,255,255,0.1)`
+- **Light**: `var(--app-surface)` + `var(--app-border)` + `var(--app-text)` de las CSS variables globales
+- `WaveformScrubber.colorUnplayed` se pasa como `rgba(255,255,255,0.2)` en dark y `rgba(0,0,0,0.15)` en light
+
+## Editor de Letras — UX (últimas mejoras)
+
+### Modo Sincronizar
+- **Player al fondo**: se mueve debajo de la lista de versos para reducir distancia entre waveform y botón "Marcar verso"
+- **Guardar en cualquier momento**: botón `💾 Guardar (X/N versos)` aparece en cuanto hay un verso marcado, sin necesidad de completar todos
+- **Confirmación de reinicio**: botón "↺ Reiniciar" abre un inline confirm ("¿Borrar todos los timestamps? · Sí, reiniciar · Cancelar") en lugar de ejecutar directamente
+- **Selector de demo** con pills styled encima de la lista
+
+### Modo En vivo
+- Player movido debajo de la lista de versos, encima del input de escritura
+- Al guardar, las líneas se ordenan por timestamp antes de persistir (versos capturados en cualquier parte de la canción quedan en orden cronológico)
+- Selector de demo con pills styled integrado en el panel
+
+### Modo Ver
+- Player movido al fondo del contenedor (barra inferior fija) junto al selector de demo
+- Texto de letras adapta color al tema (blanco en dark, `var(--app-text)` en light)
+
+### Selector de demo (`renderLinkSelector`)
+- Reemplaza `<select>` nativo con pills estilizadas usando CSS variables del tema
+- Pill activa: fondo `var(--app-accent)`, texto blanco
+- Pill inactiva: borde `var(--app-border)`, fondo `var(--app-surface-2)` / transparente en contenedor oscuro
+
 ## Sistema de Fases (Timeline)
 
 Cada cancion tiene 4 fases ordenadas:
