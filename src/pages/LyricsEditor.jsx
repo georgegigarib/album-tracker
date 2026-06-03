@@ -224,10 +224,19 @@ export default function LyricsEditor() {
     if (workingLines.length === 0) return;
     setSaving(true);
     try {
-      const textForRaw = workingLines.map((l) => l.text).join('\n');
+      // Sort by timestamp so newly written lines land in the right position
+      // regardless of when the user entered live mode. Null timestamps go last.
+      const sorted = [...workingLines].sort((a, b) => {
+        if (a.timestamp === null && b.timestamp === null) return 0;
+        if (a.timestamp === null) return 1;
+        if (b.timestamp === null) return -1;
+        return a.timestamp - b.timestamp;
+      });
+      setWorkingLines(sorted);
+      const textForRaw = sorted.map((l) => l.text).join('\n');
       await saveLyrics({
         rawText: textForRaw,
-        lines: workingLines,
+        lines: sorted,
         linkedLinkId: selectedLinkId || null,
         linkedLinkDuration: duration > 0 ? duration : (lyrics?.linkedLinkDuration ?? null),
       });
