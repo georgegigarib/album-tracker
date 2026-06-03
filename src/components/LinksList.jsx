@@ -1,22 +1,23 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Form, InputGroup, Button, ListGroup } from 'react-bootstrap';
+import { Button, ListGroup } from 'react-bootstrap';
 import { BsPlusLg, BsTrash, BsLink45Deg, BsBoxArrowUpRight, BsPlayCircleFill, BsChevronUp, BsStarFill, BsStar } from 'react-icons/bs';
 import { getGoogleDriveFileId } from '../utils/formatters';
 import DriveAudioPlayer from './DriveAudioPlayer';
 
 export default function LinksList({ links, onAdd, onDelete, onSetLatestDemo }) {
   const { t } = useTranslation('components');
-  const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [urlFocused, setUrlFocused] = useState(false);
   const [expandedPlayers, setExpandedPlayers] = useState({});
+  const titleRef = useRef(null);
 
   function togglePlayer(id) {
     setExpandedPlayers((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
-  function handleAdd(e) {
-    e.preventDefault();
+  function handleAdd() {
     if (!url.trim()) return;
     const linkTitle = title.trim() || url.trim();
     let linkUrl = url.trim();
@@ -26,28 +27,82 @@ export default function LinksList({ links, onAdd, onDelete, onSetLatestDemo }) {
     setUrl('');
   }
 
+  function handleUrlKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (url.trim()) {
+        if (titleRef.current) titleRef.current.focus();
+      }
+    }
+  }
+
+  function handleTitleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAdd();
+    }
+  }
+
+  const canAdd = url.trim().length > 0;
+
   return (
     <div>
-      <Form onSubmit={handleAdd} className="mb-3">
-        <Form.Control
-          size="sm"
-          placeholder={t('linksList.namePlaceholder')}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="mb-2"
-        />
-        <InputGroup size="sm">
-          <InputGroup.Text><BsLink45Deg /></InputGroup.Text>
-          <Form.Control
+      {/* Add link form */}
+      <div
+        className="mb-3 rounded-2 p-2"
+        style={{ border: `1px solid ${urlFocused ? 'var(--bs-primary)' : 'var(--bs-border-color)'}`, background: 'var(--app-surface)', transition: 'border-color 0.15s' }}
+      >
+        <div className="d-flex align-items-center gap-2">
+          <BsLink45Deg style={{ color: 'var(--bs-secondary)', flexShrink: 0, opacity: 0.6 }} />
+          <input
+            type="text"
             placeholder={t('linksList.urlPlaceholder')}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={handleUrlKeyDown}
+            onFocus={() => setUrlFocused(true)}
+            onBlur={() => setUrlFocused(false)}
+            className="bare-input"
+            style={{
+              flex: 1, border: 'none', outline: 'none',
+              fontSize: 14, color: 'var(--bs-body-color)',
+            }}
           />
-          <Button type="submit" variant="primary" disabled={!url.trim()}>
-            <BsPlusLg />
-          </Button>
-        </InputGroup>
-      </Form>
+        </div>
+        {url.trim() && (
+          <>
+            <div className="mt-2 pt-2 d-flex align-items-center gap-2" style={{ borderTop: '1px solid var(--bs-border-color)' }}>
+              <input
+                ref={titleRef}
+                type="text"
+                placeholder={t('linksList.namePlaceholder')}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={handleTitleKeyDown}
+                className="bare-input"
+                style={{
+                  flex: 1, border: 'none', outline: 'none',
+                  fontSize: 13, color: 'var(--bs-body-color)', opacity: 0.8,
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleAdd}
+                disabled={!canAdd}
+                style={{
+                  border: 'none', borderRadius: 20, padding: '4px 12px',
+                  background: canAdd ? 'var(--bs-primary)' : 'var(--bs-border-color)',
+                  color: 'white', fontSize: 12, cursor: canAdd ? 'pointer' : 'default',
+                  display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0,
+                  transition: 'background 0.15s',
+                }}
+              >
+                <BsPlusLg size={10} /> Añadir
+              </button>
+            </div>
+          </>
+        )}
+      </div>
 
       {links.length === 0 && (
         <p className="text-secondary text-center small py-2 mb-0">{t('linksList.empty')}</p>

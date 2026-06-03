@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BsXLg, BsMusicNoteBeamed, BsPlayFill, BsPauseFill, BsArrowCounterclockwise, BsArrowClockwise } from 'react-icons/bs';
 import WaveformScrubber from './WaveformScrubber';
 
@@ -28,6 +29,7 @@ export default function KaraokeView({
   lines = [], currentTime = 0, duration = 0, playing = false,
   songTitle = '', onClose, onTogglePlay, onSeek, onSkip, blobUrl = null,
 }) {
+  const { t } = useTranslation('components');
   const containerRef = useRef(null);
   const lineRefs = useRef([]);
 
@@ -92,7 +94,7 @@ export default function KaraokeView({
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <BsMusicNoteBeamed size={15} style={{ opacity: 0.45 }} />
           <span style={{ fontSize: 12, opacity: 0.45, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-            Letra
+            {t('karaokeView.lyrics')}
           </span>
           {songTitle && (
             <>
@@ -104,7 +106,7 @@ export default function KaraokeView({
         {onClose && (
           <button
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('karaokeView.close')}
             style={{
               background: 'rgba(255,255,255,0.1)',
               border: 'none',
@@ -138,7 +140,7 @@ export default function KaraokeView({
           }}
         >
           <BsMusicNoteBeamed size={52} />
-          <p style={{ margin: 0, fontSize: 15 }}>Letra sin sincronizar</p>
+          <p style={{ margin: 0, fontSize: 15 }}>{t('karaokeView.notSynced')}</p>
         </div>
       ) : (
         <div

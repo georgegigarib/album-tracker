@@ -7,6 +7,7 @@ import {
   BsArrowLeft, BsMusicNoteBeamed, BsPlayFill, BsPauseFill,
   BsCheck2Circle, BsExclamationTriangle, BsArrowCounterclockwise, BsArrowClockwise,
 } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 import { useLyrics } from '../hooks/useLyrics';
 import { useLinks } from '../hooks/useLinks';
 import { useSongs } from '../hooks/useSongs';
@@ -77,6 +78,7 @@ export default function LyricsEditor() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // ── Theme ─────────────────────────────────────────────────────────────────
+  const { t } = useTranslation('components');
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -425,19 +427,19 @@ export default function LyricsEditor() {
         {audioLoading && (
           <div className="d-flex align-items-center justify-content-center gap-2 py-1">
             <Spinner size="sm" style={{ color: onDark ? 'white' : undefined }} />
-            <small style={{ opacity: 0.6 }}>Descargando audio…</small>
+            <small style={{ opacity: 0.6 }}>{t('lyricsEditor.player.downloading')}</small>
           </div>
         )}
         {audioError && (
           <small style={{ color: '#ff6b6b' }}>
             {audioError.includes('401') || audioError.includes('403')
-              ? 'Sin permiso. Cierra sesión y vuelve a entrar con Google.'
-              : `Error: ${audioError}`}
+              ? t('lyricsEditor.player.noPermission')
+              : t('lyricsEditor.player.error', { error: audioError })}
           </small>
         )}
         {!selectedFileId && !audioLoading && !audioError && (
           <small style={{ opacity: 0.45 }}>
-            Sin audio seleccionado — elige un demo arriba.
+            {t('lyricsEditor.player.noAudioSelected')}
           </small>
         )}
         {blobUrl && (
@@ -546,14 +548,14 @@ export default function LyricsEditor() {
           <div className="text-secondary" style={{ fontSize: 12 }}>{song.title}</div>
           <h4 className="mb-0 d-flex align-items-center gap-2">
             <BsMusicNoteBeamed size={18} className="text-primary" />
-            Letra
+            {t('lyricsEditor.title')}
           </h4>
         </div>
         <div className="d-flex align-items-center gap-2">
-          {isDirty && <Badge bg="warning" text="dark">Sin guardar</Badge>}
+          {isDirty && <Badge bg="warning" text="dark">{t('lyricsEditor.unsaved')}</Badge>}
           {savedOk && !isDirty && (
             <span className="text-success small d-flex align-items-center gap-1">
-              <BsCheck2Circle size={14} /> Guardado
+              <BsCheck2Circle size={14} /> {t('lyricsEditor.saved')}
             </span>
           )}
         </div>
@@ -571,10 +573,10 @@ export default function LyricsEditor() {
         }}
       >
         {[
-          { key: 'write', label: '✏️ Escribir' },
-          { key: 'live', label: '✍️ En vivo' },
-          { key: 'sync', label: '⏱ Sincronizar' },
-          { key: 'view', label: '👁 Ver' },
+          { key: 'write', label: t('lyricsEditor.tabs.write') },
+          { key: 'live', label: t('lyricsEditor.tabs.live') },
+          { key: 'sync', label: t('lyricsEditor.tabs.sync') },
+          { key: 'view', label: t('lyricsEditor.tabs.view') },
         ].map(({ key, label }) => (
           <Nav.Item key={key} style={{ flex: 1 }}>
             <Nav.Link
@@ -594,10 +596,10 @@ export default function LyricsEditor() {
         <Card className="shadow-sm">
           <Card.Body className="p-4">
             <Form.Group className="mb-4">
-              <Form.Label className="fw-semibold small">Demo de audio</Form.Label>
+              <Form.Label className="fw-semibold small">{t('lyricsEditor.write.audioDemo')}</Form.Label>
               {driveLinks.length === 0 ? (
                 <Alert variant="info" className="mb-0 py-2 small">
-                  No hay links de Google Drive. Agrégalos en la sección de enlaces de la canción.
+                  {t('lyricsEditor.write.noDriveLinks')}
                 </Alert>
               ) : (
                 <Form.Select
@@ -605,29 +607,25 @@ export default function LyricsEditor() {
                   value={selectedLinkId}
                   onChange={(e) => setSelectedLinkId(e.target.value)}
                 >
-                  <option value="">Sin audio</option>
+                  <option value="">{t('lyricsEditor.write.noAudio')}</option>
                   {driveLinks.map((l) => (
                     <option key={l.id} value={l.id}>{l.title || l.url}</option>
                   ))}
                 </Form.Select>
               )}
               <Form.Text className="text-secondary">
-                Se usará para sincronizar los timestamps de cada verso.
+                {t('lyricsEditor.write.audioHint')}
               </Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-4">
-              <Form.Label className="fw-semibold small">Letra</Form.Label>
+              <Form.Label className="fw-semibold small">{t('lyricsEditor.write.lyricsLabel')}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={Math.max(10, (rawText.match(/\n/g) || []).length + 3)}
                 value={rawText}
                 onChange={(e) => { setRawText(e.target.value); setIsDirty(true); }}
-                placeholder={
-                  'Escribe la letra aquí...\n\nCada línea es un verso.\n' +
-                  'Usa líneas vacías para separar estrofas.\n\n' +
-                  'Ejemplo:\nI see trees of green\nRed roses too\nI\'ll see them bloom'
-                }
+                placeholder={t('lyricsEditor.write.lyricsPlaceholder')}
                 style={{
                   fontFamily: "'Courier New', monospace",
                   fontSize: 14,
@@ -638,10 +636,10 @@ export default function LyricsEditor() {
               />
               <div className="d-flex justify-content-between mt-1">
                 <Form.Text className="text-secondary">
-                  Una línea = un verso. Las líneas vacías se ignoran al sincronizar.
+                  {t('lyricsEditor.write.lyricsHint')}
                 </Form.Text>
                 <Form.Text className="text-secondary">
-                  {rawText.split('\n').filter((l) => l.trim()).length} versos
+                  {t('lyricsEditor.write.verseCount', { count: rawText.split('\n').filter((l) => l.trim()).length })}
                 </Form.Text>
               </div>
             </Form.Group>
@@ -653,8 +651,8 @@ export default function LyricsEditor() {
               className="px-4"
             >
               {saving
-                ? <><Spinner size="sm" className="me-2" />Guardando...</>
-                : '💾 Guardar letra'}
+                ? <><Spinner size="sm" className="me-2" />{t('lyricsEditor.write.saving')}</>
+                : t('lyricsEditor.write.saveLyrics')}
             </Button>
           </Card.Body>
         </Card>
@@ -687,12 +685,12 @@ export default function LyricsEditor() {
                   color: 'rgba(255,255,255,0.45)',
                 }}
               >
-                Sin demo de audio. Agrégalo en la pestaña{' '}
+                {t('lyricsEditor.live.noDemo')}{' '}
                 <span
                   style={{ textDecoration: 'underline', cursor: 'pointer', opacity: 0.85 }}
                   onClick={() => setMode('write')}
                 >
-                  Escribir
+                  {t('lyricsEditor.live.writeModeLabel')}
                 </span>.
               </div>
             )}
@@ -707,7 +705,7 @@ export default function LyricsEditor() {
             {workingLines.length === 0 ? (
               <div style={{ textAlign: 'center', paddingTop: 32, opacity: 0.25 }}>
                 <p style={{ margin: 0, fontSize: 14 }}>
-                  Reproduce el audio y escribe el primer verso abajo ↓
+                  {t('lyricsEditor.live.emptyHint')}
                 </p>
               </div>
             ) : (
@@ -783,7 +781,7 @@ export default function LyricsEditor() {
                 value={liveInput}
                 onChange={(e) => setLiveInput(e.target.value)}
                 onKeyDown={handleLiveKeyDown}
-                placeholder="Escribe un verso… Enter para capturar"
+                placeholder={t('lyricsEditor.live.inputPlaceholder')}
                 rows={2}
                 autoComplete="off"
                 style={{
@@ -821,8 +819,8 @@ export default function LyricsEditor() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', flexShrink: 0 }}>
                 {workingLines.length === 0
-                  ? 'Captura versos al ritmo de la música'
-                  : `${workingLines.length} ${workingLines.length === 1 ? 'verso' : 'versos'} · toca el tiempo para re-estampar`}
+                  ? t('lyricsEditor.live.captureHint')
+                  : t('lyricsEditor.live.versesHint', { count: workingLines.length })}
               </span>
               {workingLines.length > 0 && (
                 <button
@@ -837,7 +835,7 @@ export default function LyricsEditor() {
                     transition: 'all 0.2s', flexShrink: 0,
                   }}
                 >
-                  {saving ? 'Guardando…' : 'Revisar sincronización →'}
+                  {saving ? t('lyricsEditor.live.saving') : t('lyricsEditor.live.reviewSync')}
                 </button>
               )}
             </div>
@@ -853,15 +851,15 @@ export default function LyricsEditor() {
             <Alert variant="warning" className="d-flex align-items-center gap-2">
               <BsExclamationTriangle className="flex-shrink-0" />
               <span>
-                Sin versos. Escribe la letra en{' '}
+                {t('lyricsEditor.sync.noVerses')}{' '}
                 <span
                   className="fw-semibold"
                   style={{ cursor: 'pointer', textDecoration: 'underline' }}
                   onClick={() => setMode('write')}
                 >
-                  Escribir
+                  {t('lyricsEditor.sync.noVersesLink')}
                 </span>
-                {' '}y guarda antes de sincronizar.
+                {' '}{t('lyricsEditor.sync.noVersesHint')}
               </span>
             </Alert>
           )}
@@ -869,13 +867,13 @@ export default function LyricsEditor() {
           {hasLines && !selectedFileId && (
             <Alert variant="info" className="d-flex align-items-center gap-2">
               <BsExclamationTriangle className="flex-shrink-0" />
-              Selecciona un demo de audio en{' '}
+              {t('lyricsEditor.sync.selectDemo')}{' '}
               <span
                 className="fw-semibold ms-1"
                 style={{ cursor: 'pointer', textDecoration: 'underline' }}
                 onClick={() => setMode('write')}
               >
-                Escribir
+                {t('lyricsEditor.sync.selectDemoLink')}
               </span>
               .
             </Alert>
@@ -883,7 +881,7 @@ export default function LyricsEditor() {
 
           {hasLines && selectedFileId && !googleAccessToken && (
             <Alert variant="warning">
-              Inicia sesión con Google para reproducir el audio de Drive.
+              {t('lyricsEditor.sync.loginRequired')}
             </Alert>
           )}
 
@@ -891,8 +889,7 @@ export default function LyricsEditor() {
             <Alert variant="warning" className="d-flex align-items-center gap-2 flex-wrap">
               <BsExclamationTriangle className="flex-shrink-0" />
               <span className="flex-grow-1">
-                La duración del audio cambió respecto a la sincronización guardada.
-                Los timestamps pueden no coincidir.
+                {t('lyricsEditor.sync.durationChanged')}
               </span>
               <Button
                 size="sm"
@@ -900,7 +897,7 @@ export default function LyricsEditor() {
                 className="flex-shrink-0"
                 onClick={handleResetSync}
               >
-                Reiniciar sync
+                {t('lyricsEditor.sync.resetSync')}
               </Button>
             </Alert>
           )}
@@ -1036,7 +1033,7 @@ export default function LyricsEditor() {
                     }}
                   >
                     <BsCheck2Circle size={20} />
-                    <span className="fw-semibold" style={{ fontSize: 14 }}>¡Todos los versos sincronizados!</span>
+                    <span className="fw-semibold" style={{ fontSize: 14 }}>{t('lyricsEditor.sync.allSynced')}</span>
                   </div>
                 )}
               </div>
@@ -1052,15 +1049,11 @@ export default function LyricsEditor() {
                   <div style={{ fontSize: 13 }}>
                     {syncComplete ? (
                       <span className="text-success fw-semibold">
-                        ✓ {syncedCount} / {workingLines.length} sincronizados
+                        {t('lyricsEditor.sync.syncedCount', { synced: syncedCount, total: workingLines.length })}
                       </span>
                     ) : (
                       <span className="text-secondary">
-                        Verso{' '}
-                        <span className="fw-semibold text-body">
-                          {Math.min(syncIndex + 1, workingLines.length)}
-                        </span>
-                        {' '}de {workingLines.length}
+                        {t('lyricsEditor.sync.verseOf', { current: Math.min(syncIndex + 1, workingLines.length), total: workingLines.length })}
                       </span>
                     )}
                   </div>
@@ -1068,18 +1061,18 @@ export default function LyricsEditor() {
                     {/* Reset with inline confirmation */}
                     {showResetConfirm ? (
                       <div className="d-flex align-items-center gap-2">
-                        <small className="text-secondary">¿Borrar todos los timestamps?</small>
+                        <small className="text-secondary">{t('lyricsEditor.sync.deleteAllTimestamps')}</small>
                         <Button
                           size="sm" variant="danger"
                           onClick={() => { handleResetSync(); setShowResetConfirm(false); }}
                         >
-                          Sí, reiniciar
+                          {t('lyricsEditor.sync.confirmReset')}
                         </Button>
                         <Button
                           size="sm" variant="outline-secondary"
                           onClick={() => setShowResetConfirm(false)}
                         >
-                          Cancelar
+                          {t('lyricsEditor.sync.cancel')}
                         </Button>
                       </div>
                     ) : (
@@ -1092,12 +1085,12 @@ export default function LyricsEditor() {
                           borderRadius: 8,
                         }}
                       >
-                        ↺ Reiniciar
+                        {t('lyricsEditor.sync.reset')}
                       </button>
                     )}
                     {!syncComplete && !showResetConfirm && (
                       <Button size="sm" variant="outline-secondary" onClick={handleSkipLine}>
-                        Saltar →
+                        {t('lyricsEditor.sync.skip')}
                       </Button>
                     )}
                   </div>
@@ -1131,12 +1124,12 @@ export default function LyricsEditor() {
                     onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                   >
                     <>
-                      <span>⏺ MARCAR VERSO</span>
+                      <span>{t('lyricsEditor.sync.markVerse')}</span>
                       <span
                         className="d-none d-md-inline"
                         style={{ fontSize: 11, opacity: 0.55, fontWeight: 400 }}
                       >
-                        · Espacio
+                        {t('lyricsEditor.sync.spaceShortcut')}
                       </span>
                     </>
                   </button>
@@ -1175,14 +1168,14 @@ export default function LyricsEditor() {
                     {saving
                       ? <Spinner size="sm" style={{ color: 'white' }} />
                       : syncComplete
-                        ? '💾 Guardar sincronización'
-                        : `💾 Guardar (${syncedCount}/${workingLines.length} versos)`}
+                        ? t('lyricsEditor.sync.saveSync')
+                        : t('lyricsEditor.sync.savePartial', { synced: syncedCount, total: workingLines.length })}
                   </button>
                 )}
 
                 {!blobUrl && selectedFileId && !audioLoading && !audioError && (
                   <small className="text-secondary d-block text-center mt-2">
-                    Esperando que cargue el audio...
+                    {t('lyricsEditor.sync.waitingAudio')}
                   </small>
                 )}
               </div>
@@ -1205,7 +1198,7 @@ export default function LyricsEditor() {
               }}
             >
               <BsMusicNoteBeamed size={44} style={{ opacity: 0.25 }} />
-              <p style={{ opacity: 0.4, margin: 0 }}>Sin letra aún.</p>
+              <p style={{ opacity: 0.4, margin: 0 }}>{t('lyricsEditor.view.noLyrics')}</p>
               <button
                 onClick={() => setMode('write')}
                 style={{
@@ -1218,7 +1211,7 @@ export default function LyricsEditor() {
                   fontSize: 14,
                 }}
               >
-                ✏️ Escribir letra
+                {t('lyricsEditor.view.writeLyrics')}
               </button>
             </div>
           ) : (

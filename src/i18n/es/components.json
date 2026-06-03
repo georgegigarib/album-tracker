@@ -41,5 +41,96 @@
     "invalidType": "Tipo de archivo no permitido. Usa MP3, WAV, OGG, M4A, JPG, PNG o WebP.",
     "audioTooLarge": "El archivo de audio excede el límite de 10 MB.",
     "imageTooLarge": "La imagen excede el límite de 5 MB."
+  },
+  "lyricsEditor": {
+    "title": "Letra",
+    "unsaved": "Sin guardar",
+    "saved": "Guardado",
+    "tabs": {
+      "write": "✏️ Escribir",
+      "live": "✍️ En vivo",
+      "sync": "⏱ Sincronizar",
+      "view": "👁 Ver"
+    },
+    "write": {
+      "audioDemo": "Demo de audio",
+      "noDriveLinks": "No hay links de Google Drive. Agrégalos en la sección de enlaces de la canción.",
+      "noAudio": "Sin audio",
+      "audioHint": "Se usará para sincronizar los timestamps de cada verso.",
+      "lyricsLabel": "Letra",
+      "lyricsPlaceholder": "Escribe la letra aquí...\n\nCada línea es un verso.\nUsa líneas vacías para separar estrofas.\n\nEjemplo:\nI see trees of green\nRed roses too\nI'll see them bloom",
+      "lyricsHint": "Una línea = un verso. Las líneas vacías se ignoran al sincronizar.",
+      "verseCount_one": "1 verso",
+      "verseCount_other": "{{count}} versos",
+      "saveLyrics": "💾 Guardar letra",
+      "saving": "Guardando..."
+    },
+    "live": {
+      "noDemo": "Sin demo de audio. Agrégalo en la pestaña",
+      "writeModeLabel": "Escribir",
+      "emptyHint": "Reproduce el audio y escribe el primer verso abajo ↓",
+      "inputPlaceholder": "Escribe un verso… Enter para capturar",
+      "captureHint": "Captura versos al ritmo de la música",
+      "versesHint_one": "{{count}} verso · toca el tiempo para re-estampar",
+      "versesHint_other": "{{count}} versos · toca el tiempo para re-estampar",
+      "reviewSync": "Revisar sincronización →",
+      "saving": "Guardando…"
+    },
+    "sync": {
+      "noVerses": "Sin versos. Escribe la letra en",
+      "noVersesLink": "Escribir",
+      "noVersesHint": "y guarda antes de sincronizar.",
+      "selectDemo": "Selecciona un demo de audio en",
+      "selectDemoLink": "Escribir",
+      "loginRequired": "Inicia sesión con Google para reproducir el audio de Drive.",
+      "durationChanged": "La duración del audio cambió respecto a la sincronización guardada. Los timestamps pueden no coincidir.",
+      "resetSync": "Reiniciar sync",
+      "allSynced": "¡Todos los versos sincronizados!",
+      "syncedCount": "✓ {{synced}} / {{total}} sincronizados",
+      "verseOf": "Verso {{current}} de {{total}}",
+      "deleteAllTimestamps": "¿Borrar todos los timestamps?",
+      "confirmReset": "Sí, reiniciar",
+      "cancel": "Cancelar",
+      "reset": "↺ Reiniciar",
+      "skip": "Saltar →",
+      "markVerse": "⏺ MARCAR VERSO",
+      "spaceShortcut": "· Espacio",
+      "saveSync": "💾 Guardar sincronización",
+      "savePartial": "💾 Guardar ({{synced}}/{{total}} versos)",
+      "waitingAudio": "Esperando que cargue el audio..."
+    },
+    "view": {
+      "noLyrics": "Sin letra aún.",
+      "writeLyrics": "✏️ Escribir letra"
+    },
+    "player": {
+      "downloading": "Descargando audio…",
+      "noPermission": "Sin permiso. Cierra sesión y vuelve a entrar con Google.",
+      "error": "Error: {{error}}",
+      "noAudioSelected": "Sin audio seleccionado — elige un demo arriba."
+    }
+  },
+  "karaokeView": {
+    "lyrics": "Letra",
+    "close": "Cerrar",
+    "notSynced": "Letra sin sincronizar"
+  },
+  "lyricsWidget": {
+    "title": "Letra",
+    "noLyrics": "Sin letra escrita.",
+    "writeLyrics": "+ Escribir letra",
+    "verses_one": "1 verso",
+    "verses_other": "{{count}} versos",
+    "synced": "Sincronizada",
+    "partialSync": "{{synced}}/{{total}} sincronizados",
+    "moreVerses_one": "+1 verso más...",
+    "moreVerses_other": "+{{count}} versos más...",
+    "viewEdit": "Ver / Editar letra"
+  },
+  "latestDemoPlayer": {
+    "badge": "Demo Principal",
+    "viewLyricsTitle": "Ver letra (karaoke)",
+    "lyricsBtn": "Letra",
+    "signInRequired": "Inicia sesión con Google para reproducir."
   }
 }

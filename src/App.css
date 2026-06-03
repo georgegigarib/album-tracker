@@ -255,6 +255,28 @@ body {
   display: none;
 }
 
+/* ── Bare inputs (inline, not .form-control) ── */
+
+.bare-input,
+.bare-textarea {
+  background-color: transparent !important;
+  color: inherit !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.bare-input:focus,
+.bare-textarea:focus {
+  background-color: transparent !important;
+  outline: none;
+}
+
+.bare-input:-webkit-autofill,
+.bare-textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+}
+
 /* ── Misc ── */
 
 .text-secondary {

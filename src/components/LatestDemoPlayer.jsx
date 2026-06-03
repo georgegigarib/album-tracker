@@ -7,6 +7,7 @@ import { useTheme } from '../hooks/useTheme';
 import { driveAudioCache } from '../utils/driveAudioCache';
 import KaraokeView from './KaraokeView';
 import WaveformScrubber from './WaveformScrubber';
+import { useTranslation } from 'react-i18next';
 
 function formatTime(seconds) {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -16,6 +17,7 @@ function formatTime(seconds) {
 }
 
 export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId, songId }) {
+  const { t } = useTranslation('components');
   const { googleAccessToken } = useAuthContext();
   const { lyrics } = useLyrics(albumId, songId);
   const { theme } = useTheme();
@@ -44,35 +46,45 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
   const skipBaseBg  = isDark ? 'rgba(255,255,255,0.1)'  : 'rgba(0,0,0,0.06)';
 
   useEffect(() => {
-    if (driveAudioCache.has(fileId)) {
-      setBlobUrl(driveAudioCache.get(fileId));
-      return;
-    }
-    if (!googleAccessToken) return;
-
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
-    fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-      headers: { Authorization: `Bearer ${googleAccessToken}` },
-    })
-      .then(async (res) => {
+    async function loadAudio() {
+      if (driveAudioCache.has(fileId)) {
+        if (!cancelled) {
+          setBlobUrl(driveAudioCache.get(fileId));
+        }
+        return;
+      }
+      if (!googleAccessToken) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+          headers: { Authorization: `Bearer ${googleAccessToken}` },
+        });
+
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           const reason = body?.error?.errors?.[0]?.reason || res.status;
           throw new Error(`${res.status}:${reason}`);
         }
-        return res.blob();
-      })
-      .then((blob) => {
+
+        const blob = await res.blob();
         if (cancelled) return;
+
         const url = URL.createObjectURL(blob);
         driveAudioCache.set(fileId, url);
         setBlobUrl(url);
-      })
-      .catch((err) => { if (!cancelled) setError(err.message); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadAudio();
 
     return () => { cancelled = true; };
   }, [fileId, googleAccessToken]);
@@ -147,7 +159,7 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
               }}
               className="mb-2 fw-normal text-uppercase"
             >
-              Latest Demo
+              {t('latestDemoPlayer.badge')}
             </Badge>
             <div className="fw-bold" style={{ fontSize: 18, lineHeight: 1.2 }}>{songTitle}</div>
             {linkTitle && <div style={{ fontSize: 13, opacity: 0.6, marginTop: 2 }}>{linkTitle}</div>}
@@ -156,7 +168,7 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
             {hasKaraoke && (
               <button
                 onClick={() => setShowKaraoke(true)}
-                title="Ver letra (karaoke)"
+                title={t('latestDemoPlayer.viewLyricsTitle')}
                 style={{
                   background: isDark ? 'rgba(255,255,255,0.1)' : 'var(--app-surface-2)',
                   border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid var(--app-border)',
@@ -175,7 +187,7 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
                 onMouseLeave={(e) => { e.currentTarget.style.background = skipBaseBg; }}
               >
                 <BsMusicNoteBeamed size={12} />
-                Letra
+                {t('latestDemoPlayer.lyricsBtn')}
               </button>
             )}
             <BsMusicNoteBeamed size={24} style={{ opacity: 0.15, flexShrink: 0 }} />
@@ -248,7 +260,7 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
 
         {!googleAccessToken && (
           <p className="mb-0 mt-2 text-center" style={{ fontSize: 12, opacity: 0.6 }}>
-            Inicia sesión con Google para reproducir.
+            {t('latestDemoPlayer.signInRequired')}
           </p>
         )}
       </div>

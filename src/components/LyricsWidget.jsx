@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Spinner } from 'react-bootstrap';
 import { BsMusicNoteBeamed, BsCheckCircleFill } from 'react-icons/bs';
 import { useLyrics } from '../hooks/useLyrics';
 
 export default function LyricsWidget({ albumId, songId }) {
+  const { t } = useTranslation('components');
   const { lyrics, loading } = useLyrics(albumId, songId);
 
   const lyricsPath = `/albums/${albumId}/songs/${songId}/lyrics`;
@@ -15,29 +17,29 @@ export default function LyricsWidget({ albumId, songId }) {
     <Card className="shadow-sm mt-3">
       <Card.Header className="fw-semibold py-2 d-flex align-items-center gap-2">
         <BsMusicNoteBeamed size={14} />
-        Letra
+        {t('lyricsWidget.title')}
       </Card.Header>
       <Card.Body className="py-2">
         {loading ? (
           <div className="text-center py-2"><Spinner size="sm" /></div>
         ) : !lyrics ? (
           <>
-            <p className="small text-secondary mb-2">Sin letra escrita.</p>
+            <p className="small text-secondary mb-2">{t('lyricsWidget.noLyrics')}</p>
             <Button as={Link} to={lyricsPath} size="sm" variant="outline-secondary" className="w-100">
-              + Escribir letra
+              {t('lyricsWidget.writeLyrics')}
             </Button>
           </>
         ) : (
           <>
             <div className="d-flex align-items-center gap-2 mb-2">
-              <small className="text-secondary">{totalLines} versos</small>
+              <small className="text-secondary">{t('lyricsWidget.verses', { count: totalLines })}</small>
               {isSynced && (
                 <small className="text-success d-flex align-items-center gap-1">
-                  <BsCheckCircleFill size={11} /> Sincronizada
+                  <BsCheckCircleFill size={11} /> {t('lyricsWidget.synced')}
                 </small>
               )}
               {!isSynced && syncedCount > 0 && (
-                <small className="text-warning">{syncedCount}/{totalLines} sincronizados</small>
+                <small className="text-warning">{t('lyricsWidget.partialSync', { synced: syncedCount, total: totalLines })}</small>
               )}
             </div>
 
@@ -48,12 +50,12 @@ export default function LyricsWidget({ albumId, songId }) {
             ))}
             {totalLines > 2 && (
               <p className="small text-secondary mb-2" style={{ opacity: 0.5 }}>
-                +{totalLines - 2} versos más...
+                {t('lyricsWidget.moreVerses', { count: totalLines - 2 })}
               </p>
             )}
 
             <Button as={Link} to={lyricsPath} size="sm" variant="outline-primary" className="w-100 mt-1">
-              Ver / Editar letra
+              {t('lyricsWidget.viewEdit')}
             </Button>
           </>
         )}
