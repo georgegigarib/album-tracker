@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AlbumDetail from './pages/AlbumDetail';
 import SongDetail from './pages/SongDetail';
+import LyricsEditor from './pages/LyricsEditor';
 import AlbumSettings from './pages/AlbumSettings';
 import Profile from './pages/Profile';
 
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/albums/:albumId" element={<PrivateRoute><AlbumDetail /></PrivateRoute>} />
           <Route path="/albums/:albumId/songs/:songId" element={<PrivateRoute><SongDetail /></PrivateRoute>} />
+          <Route path="/albums/:albumId/songs/:songId/lyrics" element={<PrivateRoute><LyricsEditor /></PrivateRoute>} />
           <Route path="/albums/:albumId/settings" element={<PrivateRoute><AlbumSettings /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

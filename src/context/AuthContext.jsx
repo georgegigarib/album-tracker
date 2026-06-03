@@ -6,14 +6,26 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  GoogleAuthProvider,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../config/firebase';
 import { AuthContext } from './authContextValue';
 
+const TOKEN_KEY = 'gdrive_token';
+const TOKEN_EXPIRY_KEY = 'gdrive_token_expiry';
+
+function loadStoredToken() {
+  const token = sessionStorage.getItem(TOKEN_KEY);
+  const expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
+  if (token && expiry && Date.now() < Number(expiry)) return token;
+  return null;
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [googleAccessToken, setGoogleAccessToken] = useState(loadStoredToken);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -51,16 +63,25 @@ export function AuthProvider({ children }) {
   }
 
   async function loginWithGoogle() {
-    const { user: googleUser } = await signInWithPopup(auth, googleProvider);
-    await ensureUserDoc(googleUser);
-    return googleUser;
+    const result = await signInWithPopup(auth, googleProvider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (credential?.accessToken) {
+      setGoogleAccessToken(credential.accessToken);
+      sessionStorage.setItem(TOKEN_KEY, credential.accessToken);
+      sessionStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + 3600 * 1000));
+    }
+    await ensureUserDoc(result.user);
+    return result.user;
   }
 
   async function logout() {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
+    setGoogleAccessToken(null);
     await signOut(auth);
   }
 
-  const value = { user, loading, register, login, loginWithGoogle, logout };
+  const value = { user, loading, googleAccessToken, register, login, loginWithGoogle, logout };
 
   return (
     <AuthContext.Provider value={value}>

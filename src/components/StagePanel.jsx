@@ -30,6 +30,7 @@ export default function StagePanel({
   links,
   onAddLink,
   onDeleteLink,
+  onSetLatestDemo,
 }) {
   const { t } = useTranslation('songDetail');
   const showInstruments = STAGES_WITH_INSTRUMENTS.includes(stageKey);
@@ -93,6 +94,7 @@ export default function StagePanel({
             links={links}
             onAdd={onAddLink}
             onDelete={onDeleteLink}
+            onSetLatestDemo={onSetLatestDemo}
           />
         </Card.Body>
       </Card>

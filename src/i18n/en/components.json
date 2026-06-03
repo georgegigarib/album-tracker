@@ -10,7 +10,9 @@
   "linksList": {
     "namePlaceholder": "Link name (optional)",
     "urlPlaceholder": "https://drive.google.com/...",
-    "empty": "No links."
+    "empty": "No links.",
+    "playInApp": "Play in app",
+    "hidePlayer": "Hide player"
   },
   "fileUploader": {
     "dragOrClick": "Drag files here or click to select",
@@ -39,5 +41,96 @@
     "invalidType": "File type not allowed. Use MP3, WAV, OGG, M4A, JPG, PNG or WebP.",
     "audioTooLarge": "Audio file exceeds the 10 MB limit.",
     "imageTooLarge": "Image exceeds the 5 MB limit."
+  },
+  "lyricsEditor": {
+    "title": "Lyrics",
+    "unsaved": "Unsaved",
+    "saved": "Saved",
+    "tabs": {
+      "write": "✏️ Write",
+      "live": "✍️ Live",
+      "sync": "⏱ Sync",
+      "view": "👁 View"
+    },
+    "write": {
+      "audioDemo": "Audio demo",
+      "noDriveLinks": "No Google Drive links. Add them in the song's links section.",
+      "noAudio": "No audio",
+      "audioHint": "Used to sync timestamps for each verse.",
+      "lyricsLabel": "Lyrics",
+      "lyricsPlaceholder": "Write the lyrics here...\n\nEach line is a verse.\nUse blank lines to separate stanzas.\n\nExample:\nI see trees of green\nRed roses too\nI'll see them bloom",
+      "lyricsHint": "One line = one verse. Blank lines are ignored when syncing.",
+      "verseCount_one": "1 verse",
+      "verseCount_other": "{{count}} verses",
+      "saveLyrics": "💾 Save lyrics",
+      "saving": "Saving..."
+    },
+    "live": {
+      "noDemo": "No audio demo. Add it in the",
+      "writeModeLabel": "Write",
+      "emptyHint": "Play the audio and write the first verse below ↓",
+      "inputPlaceholder": "Write a verse… Enter to capture",
+      "captureHint": "Capture verses to the beat of the music",
+      "versesHint_one": "{{count}} verse · tap timestamp to re-stamp",
+      "versesHint_other": "{{count}} verses · tap timestamp to re-stamp",
+      "reviewSync": "Review sync →",
+      "saving": "Saving…"
+    },
+    "sync": {
+      "noVerses": "No verses. Write the lyrics in",
+      "noVersesLink": "Write",
+      "noVersesHint": "and save before syncing.",
+      "selectDemo": "Select an audio demo in",
+      "selectDemoLink": "Write",
+      "loginRequired": "Sign in with Google to play Drive audio.",
+      "durationChanged": "Audio duration changed from saved sync. Timestamps may not match.",
+      "resetSync": "Reset sync",
+      "allSynced": "All verses synced!",
+      "syncedCount": "✓ {{synced}} / {{total}} synced",
+      "verseOf": "Verse {{current}} of {{total}}",
+      "deleteAllTimestamps": "Delete all timestamps?",
+      "confirmReset": "Yes, reset",
+      "cancel": "Cancel",
+      "reset": "↺ Reset",
+      "skip": "Skip →",
+      "markVerse": "⏺ MARK VERSE",
+      "spaceShortcut": "· Space",
+      "saveSync": "💾 Save sync",
+      "savePartial": "💾 Save ({{synced}}/{{total}} verses)",
+      "waitingAudio": "Waiting for audio to load..."
+    },
+    "view": {
+      "noLyrics": "No lyrics yet.",
+      "writeLyrics": "✏️ Write lyrics"
+    },
+    "player": {
+      "downloading": "Downloading audio…",
+      "noPermission": "No permission. Sign out and sign in again with Google.",
+      "error": "Error: {{error}}",
+      "noAudioSelected": "No audio selected — choose a demo above."
+    }
+  },
+  "karaokeView": {
+    "lyrics": "Lyrics",
+    "close": "Close",
+    "notSynced": "Lyrics not synced"
+  },
+  "lyricsWidget": {
+    "title": "Lyrics",
+    "noLyrics": "No lyrics written.",
+    "writeLyrics": "+ Write lyrics",
+    "verses_one": "1 verse",
+    "verses_other": "{{count}} verses",
+    "synced": "Synced",
+    "partialSync": "{{synced}}/{{total}} synced",
+    "moreVerses_one": "+1 more verse...",
+    "moreVerses_other": "+{{count}} more verses...",
+    "viewEdit": "View / Edit lyrics"
+  },
+  "latestDemoPlayer": {
+    "badge": "Latest Demo",
+    "viewLyricsTitle": "View lyrics (karaoke)",
+    "lyricsBtn": "Lyrics",
+    "signInRequired": "Sign in with Google to play."
   }
 }

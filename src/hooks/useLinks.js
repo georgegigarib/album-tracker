@@ -9,6 +9,7 @@ import {
   serverTimestamp,
   orderBy,
   query,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuthContext } from './useAuth';
@@ -59,5 +60,18 @@ export function useLinks(albumId, songId) {
     await deleteDoc(doc(db, 'albums', albumId, 'songs', songId, 'links', linkId));
   }
 
-  return { allLinks, loading, getLinksByStage, addLink, updateLink, deleteLink };
+  async function setLatestDemo(linkId) {
+    const batch = writeBatch(db);
+    allLinks.forEach((link) => {
+      if (link.isLatestDemo) {
+        batch.update(doc(db, 'albums', albumId, 'songs', songId, 'links', link.id), { isLatestDemo: false });
+      }
+    });
+    if (linkId) {
+      batch.update(doc(db, 'albums', albumId, 'songs', songId, 'links', linkId), { isLatestDemo: true });
+    }
+    await batch.commit();
+  }
+
+  return { allLinks, loading, getLinksByStage, addLink, updateLink, deleteLink, setLatestDemo };
 }

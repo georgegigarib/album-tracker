@@ -11,7 +11,9 @@ import { useAlbums } from '../hooks/useAlbums';
 import Timeline from '../components/Timeline';
 import StagePanel from '../components/StagePanel';
 import ConfirmModal from '../components/ConfirmModal';
-import { formatDate, getStatusLabel, getStatusVariant } from '../utils/formatters';
+import LatestDemoPlayer from '../components/LatestDemoPlayer';
+import LyricsWidget from '../components/LyricsWidget';
+import { formatDate, getStatusLabel, getStatusVariant, getGoogleDriveFileId } from '../utils/formatters';
 
 export default function SongDetail() {
   const { t } = useTranslation('songDetail');
@@ -23,7 +25,7 @@ export default function SongDetail() {
     toggleStage, updateSong, deleteSong,
   } = useSongs(albumId);
   const { getNotesByStage, addNote, updateNote, deleteNote } = useNotes(albumId, songId);
-  const { getLinksByStage, addLink, deleteLink } = useLinks(albumId, songId);
+  const { allLinks, getLinksByStage, addLink, deleteLink, setLatestDemo } = useLinks(albumId, songId);
   const { getSubtasksByStage, addSubtask, toggleSubtask, deleteSubtask } = useSubtasks(albumId, songId);
   const [showDelete, setShowDelete] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -32,6 +34,7 @@ export default function SongDetail() {
 
   const album = albums.find((a) => a.id === albumId);
   const song = songs.find((s) => s.id === songId);
+  const latestDemo = allLinks.find((l) => l.isLatestDemo);
 
   if (!album || !song) {
     return <Container className="py-4"><p className="text-secondary">{t('common:loading')}</p></Container>;
@@ -120,6 +123,17 @@ export default function SongDetail() {
         </div>
       </div>
 
+      {/* Latest demo player */}
+      {latestDemo && getGoogleDriveFileId(latestDemo.url) && (
+        <LatestDemoPlayer
+          fileId={getGoogleDriveFileId(latestDemo.url)}
+          linkTitle={latestDemo.title}
+          songTitle={song.title}
+          albumId={albumId}
+          songId={songId}
+        />
+      )}
+
       {/* Timeline */}
       <Timeline
         stages={song.stages}
@@ -164,6 +178,8 @@ export default function SongDetail() {
               </div>
             </Card.Body>
           </Card>
+
+          <LyricsWidget albumId={albumId} songId={songId} />
         </Col>
 
         {/* Right content */}
@@ -187,6 +203,7 @@ export default function SongDetail() {
             links={stageLinks}
             onAddLink={(title, url) => addLink(title, url, activeStage)}
             onDeleteLink={deleteLink}
+            onSetLatestDemo={setLatestDemo}
           />
         </Col>
       </Row>
