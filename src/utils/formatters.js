@@ -43,6 +43,40 @@ export function getStageLabel(stageKey) {
   return i18n.t(`common:stages.${stageKey}`, { defaultValue: stageKey });
 }
 
+export function getGoogleDriveFileId(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes('drive.google.com')) return null;
+    const fileMatch = parsed.pathname.match(/\/file\/d\/([^/]+)/);
+    if (fileMatch) return fileMatch[1];
+    return parsed.searchParams.get('id') || null;
+  } catch {
+    return null;
+  }
+}
+
+export function getGoogleDriveEmbedUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes('drive.google.com')) return null;
+
+    // https://drive.google.com/file/d/FILE_ID/view
+    const fileMatch = parsed.pathname.match(/\/file\/d\/([^/]+)/);
+    if (fileMatch) return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+
+    // https://drive.google.com/open?id=FILE_ID
+    // https://drive.google.com/uc?id=FILE_ID
+    const idParam = parsed.searchParams.get('id');
+    if (idParam) return `https://drive.google.com/file/d/${idParam}/preview`;
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function calcOverallProgress(stages, stageProgress) {
   const stageItems = stages ? Object.values(stages) : [];
   const instrumentItems = [];

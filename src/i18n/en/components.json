@@ -10,7 +10,9 @@
   "linksList": {
     "namePlaceholder": "Link name (optional)",
     "urlPlaceholder": "https://drive.google.com/...",
-    "empty": "No links."
+    "empty": "No links.",
+    "playInApp": "Play in app",
+    "hidePlayer": "Hide player"
   },
   "fileUploader": {
     "dragOrClick": "Drag files here or click to select",

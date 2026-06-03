@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Form, InputGroup, Button, ListGroup } from 'react-bootstrap';
-import { BsPlusLg, BsTrash, BsLink45Deg, BsBoxArrowUpRight } from 'react-icons/bs';
+import { BsPlusLg, BsTrash, BsLink45Deg, BsBoxArrowUpRight, BsPlayCircleFill, BsChevronUp, BsStarFill, BsStar } from 'react-icons/bs';
+import { getGoogleDriveFileId } from '../utils/formatters';
+import DriveAudioPlayer from './DriveAudioPlayer';
 
-export default function LinksList({ links, onAdd, onDelete }) {
+export default function LinksList({ links, onAdd, onDelete, onSetLatestDemo }) {
   const { t } = useTranslation('components');
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const [expandedPlayers, setExpandedPlayers] = useState({});
+
+  function togglePlayer(id) {
+    setExpandedPlayers((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
 
   function handleAdd(e) {
     e.preventDefault();
@@ -47,28 +54,60 @@ export default function LinksList({ links, onAdd, onDelete }) {
       )}
 
       <ListGroup variant="flush">
-        {links.map((link) => (
-          <ListGroup.Item key={link.id} className="d-flex align-items-center gap-2 px-0 py-2 border-0">
-            <BsLink45Deg className="text-primary flex-shrink-0" />
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-grow-1 text-truncate"
-            >
-              {link.title || link.url}
-              <BsBoxArrowUpRight size={10} className="ms-1 opacity-50" />
-            </a>
-            <Button
-              size="sm"
-              variant="link"
-              className="p-0 text-danger flex-shrink-0"
-              onClick={() => onDelete(link.id)}
-            >
-              <BsTrash size={14} />
-            </Button>
-          </ListGroup.Item>
-        ))}
+        {links.map((link) => {
+          const fileId = getGoogleDriveFileId(link.url);
+          const isExpanded = !!expandedPlayers[link.id];
+          return (
+            <ListGroup.Item key={link.id} className="px-0 py-2 border-0">
+              <div className="d-flex align-items-center gap-2">
+                <BsLink45Deg className="text-primary flex-shrink-0" />
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-grow-1 text-truncate"
+                >
+                  {link.title || link.url}
+                  <BsBoxArrowUpRight size={10} className="ms-1 opacity-50" />
+                </a>
+                {fileId && onSetLatestDemo && (
+                  <Button
+                    size="sm"
+                    variant="link"
+                    className="p-0 flex-shrink-0"
+                    style={{ color: link.isLatestDemo ? '#f5a623' : 'var(--bs-secondary-color)' }}
+                    title={link.isLatestDemo ? 'Quitar como demo principal' : 'Marcar como demo principal'}
+                    onClick={() => onSetLatestDemo(link.isLatestDemo ? null : link.id)}
+                  >
+                    {link.isLatestDemo ? <BsStarFill size={14} /> : <BsStar size={14} />}
+                  </Button>
+                )}
+                {fileId && (
+                  <Button
+                    size="sm"
+                    variant="link"
+                    className="p-0 text-success flex-shrink-0"
+                    title={isExpanded ? t('linksList.hidePlayer') : t('linksList.playInApp')}
+                    onClick={() => togglePlayer(link.id)}
+                  >
+                    {isExpanded ? <BsChevronUp size={14} /> : <BsPlayCircleFill size={16} />}
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="link"
+                  className="p-0 text-danger flex-shrink-0"
+                  onClick={() => onDelete(link.id)}
+                >
+                  <BsTrash size={14} />
+                </Button>
+              </div>
+              {fileId && isExpanded && (
+                <DriveAudioPlayer fileId={fileId} />
+              )}
+            </ListGroup.Item>
+          );
+        })}
       </ListGroup>
     </div>
   );
