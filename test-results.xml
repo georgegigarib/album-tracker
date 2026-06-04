@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="57" failures="0" errors="0" time="0.615269709">
+    <testsuite name="src/__tests__/AudioPlayer.test.jsx" timestamp="2026-06-04T03:06:31.764Z" hostname="Mac.Home" tests="2" failures="0" errors="0" skipped="0" time="0.023245916">
+        <testcase classname="src/__tests__/AudioPlayer.test.jsx" name="AudioPlayer &gt; renders audio element with source" time="0.0200415">
+        </testcase>
+        <testcase classname="src/__tests__/AudioPlayer.test.jsx" name="AudioPlayer &gt; has controls attribute" time="0.002327">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/ConfirmModal.test.jsx" timestamp="2026-06-04T03:06:31.764Z" hostname="Mac.Home" tests="4" failures="0" errors="0" skipped="0" time="0.126010542">
+        <testcase classname="src/__tests__/ConfirmModal.test.jsx" name="ConfirmModal &gt; renders title and message when shown" time="0.070435">
+        </testcase>
+        <testcase classname="src/__tests__/ConfirmModal.test.jsx" name="ConfirmModal &gt; does not render when show is false" time="0.002877">
+        </testcase>
+        <testcase classname="src/__tests__/ConfirmModal.test.jsx" name="ConfirmModal &gt; calls onConfirm when confirm button clicked" time="0.028514417">
+        </testcase>
+        <testcase classname="src/__tests__/ConfirmModal.test.jsx" name="ConfirmModal &gt; calls onCancel when cancel button clicked" time="0.023525709">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/InstrumentChecklist.test.jsx" timestamp="2026-06-04T03:06:31.765Z" hostname="Mac.Home" tests="6" failures="0" errors="0" skipped="0" time="0.116590208">
+        <testcase classname="src/__tests__/InstrumentChecklist.test.jsx" name="InstrumentChecklist &gt; renders all instruments" time="0.02432575">
+        </testcase>
+        <testcase classname="src/__tests__/InstrumentChecklist.test.jsx" name="InstrumentChecklist &gt; shows completed items with line-through" time="0.004710958">
+        </testcase>
+        <testcase classname="src/__tests__/InstrumentChecklist.test.jsx" name="InstrumentChecklist &gt; calls onToggle when label clicked" time="0.065128166">
+        </testcase>
+        <testcase classname="src/__tests__/InstrumentChecklist.test.jsx" name="InstrumentChecklist &gt; returns null for null progress" time="0.000682292">
+        </testcase>
+        <testcase classname="src/__tests__/InstrumentChecklist.test.jsx" name="InstrumentChecklist &gt; shows add instrument dropdown" time="0.003156291">
+        </testcase>
+        <testcase classname="src/__tests__/InstrumentChecklist.test.jsx" name="InstrumentChecklist &gt; calls onRemove when remove button clicked" time="0.017613709">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/ProgressBar.test.jsx" timestamp="2026-06-04T03:06:31.765Z" hostname="Mac.Home" tests="4" failures="0" errors="0" skipped="0" time="0.031704542">
+        <testcase classname="src/__tests__/ProgressBar.test.jsx" name="SongCard progress display &gt; renders song title" time="0.024729625">
+        </testcase>
+        <testcase classname="src/__tests__/ProgressBar.test.jsx" name="SongCard progress display &gt; renders progress percentage" time="0.002623625">
+        </testcase>
+        <testcase classname="src/__tests__/ProgressBar.test.jsx" name="SongCard progress display &gt; renders status badge" time="0.001842375">
+        </testcase>
+        <testcase classname="src/__tests__/ProgressBar.test.jsx" name="SongCard progress display &gt; shows 0% for songs with no progress" time="0.001600625">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/SubtaskList.test.jsx" timestamp="2026-06-04T03:06:31.765Z" hostname="Mac.Home" tests="5" failures="0" errors="0" skipped="0" time="0.203736791">
+        <testcase classname="src/__tests__/SubtaskList.test.jsx" name="SubtaskList &gt; renders all subtasks" time="0.038210875">
+        </testcase>
+        <testcase classname="src/__tests__/SubtaskList.test.jsx" name="SubtaskList &gt; shows completed subtasks with line-through" time="0.00861175">
+        </testcase>
+        <testcase classname="src/__tests__/SubtaskList.test.jsx" name="SubtaskList &gt; calls onAdd when form is submitted" time="0.121317125">
+        </testcase>
+        <testcase classname="src/__tests__/SubtaskList.test.jsx" name="SubtaskList &gt; shows empty message when no subtasks" time="0.001837625">
+        </testcase>
+        <testcase classname="src/__tests__/SubtaskList.test.jsx" name="SubtaskList &gt; calls onToggle when checkbox is clicked" time="0.033012375">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/Timeline.test.jsx" timestamp="2026-06-04T03:06:31.766Z" hostname="Mac.Home" tests="4" failures="0" errors="0" skipped="0" time="0.103173459">
+        <testcase classname="src/__tests__/Timeline.test.jsx" name="Timeline &gt; renders all four stages" time="0.022122958">
+        </testcase>
+        <testcase classname="src/__tests__/Timeline.test.jsx" name="Timeline &gt; calls onSelectStage when a stage is clicked" time="0.075883">
+        </testcase>
+        <testcase classname="src/__tests__/Timeline.test.jsx" name="Timeline &gt; highlights active stage" time="0.003575541">
+        </testcase>
+        <testcase classname="src/__tests__/Timeline.test.jsx" name="Timeline &gt; returns null for null stages" time="0.000715375">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/formatters.test.js" timestamp="2026-06-04T03:06:31.766Z" hostname="Mac.Home" tests="18" failures="0" errors="0" skipped="0" time="0.004664292">
+        <testcase classname="src/__tests__/formatters.test.js" name="formatFileSize &gt; formats 0 bytes" time="0.000648917">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="formatFileSize &gt; formats kilobytes" time="0.000232875">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="formatFileSize &gt; formats megabytes" time="0.000105958">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcCompletionPercent &gt; returns 0 for null progress" time="0.000304917">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcCompletionPercent &gt; returns 0 for empty progress" time="0.000052459">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcCompletionPercent &gt; calculates 50% correctly" time="0.0000935">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcCompletionPercent &gt; calculates 100% correctly" time="0.000062542">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcCompletionPercent &gt; rounds to nearest integer" time="0.000038583">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="getStatusLabel &gt; returns correct labels" time="0.001173">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="getStatusLabel &gt; returns raw value for unknown status" time="0.000176917">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="getStatusVariant &gt; returns correct Bootstrap variants" time="0.000060125">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="getStageLabel &gt; returns correct stage labels" time="0.000391875">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="getStageLabel &gt; returns raw key for unknown stage" time="0.000056083">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcOverallProgress &gt; returns 0 when both are null" time="0.000049542">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcOverallProgress &gt; combines stages and per-stage instruments" time="0.0000355">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcOverallProgress &gt; returns 100% when all completed" time="0.000024292">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcOverallProgress &gt; works with only stages" time="0.000023375">
+        </testcase>
+        <testcase classname="src/__tests__/formatters.test.js" name="calcOverallProgress &gt; works with multiple stages having different progress" time="0.00002275">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/__tests__/validators.test.js" timestamp="2026-06-04T03:06:31.767Z" hostname="Mac.Home" tests="14" failures="0" errors="0" skipped="0" time="0.006143959">
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; rejects null file" time="0.0021875">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; accepts mp3 file under 10MB" time="0.000264792">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; accepts png image under 5MB" time="0.000260875">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; rejects audio over 10MB" time="0.00057375">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; rejects image over 5MB" time="0.000226916">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; rejects unsupported file type" time="0.000245375">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; accepts wav file" time="0.000051792">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateFile &gt; accepts webp image" time="0.000033542">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateEmail &gt; accepts valid email" time="0.000442584">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validateEmail &gt; rejects invalid email" time="0.000154583">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validatePassword &gt; returns null for valid password" time="0.000087416">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="validatePassword &gt; returns error for short password" time="0.000336167">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="checkStorageLimit &gt; returns true when under limit" time="0.00008575">
+        </testcase>
+        <testcase classname="src/__tests__/validators.test.js" name="checkStorageLimit &gt; returns false when over limit" time="0.000046542">
+        </testcase>
+    </testsuite>
+</testsuites>

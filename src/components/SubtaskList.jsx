@@ -14,6 +14,9 @@ function SubtaskRow({ subtask, onToggle, onDelete }) {
     >
       <button
         type="button"
+        role="checkbox"
+        aria-checked={subtask.completed}
+        aria-label={subtask.title}
         onClick={() => onToggle(subtask.id, subtask.completed)}
         style={{
           width: 20, height: 20, borderRadius: 4, flexShrink: 0, padding: 0,
