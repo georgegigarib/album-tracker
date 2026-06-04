@@ -30,6 +30,7 @@ export default function SongDetail() {
   const [showDelete, setShowDelete] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState('');
+  const [editingDate, setEditingDate] = useState(false);
   const [activeStage, setActiveStage] = useState('recording');
 
   const album = albums.find((a) => a.id === albumId);
@@ -77,6 +78,18 @@ export default function SongDetail() {
       await updateSong(songId, { title: titleValue.trim() });
     }
     setEditingTitle(false);
+  }
+
+  function getDateInputValue() {
+    if (!song.estimatedEndDate) return '';
+    const d = song.estimatedEndDate?.toDate?.() ?? new Date(song.estimatedEndDate);
+    return d.toISOString().slice(0, 10);
+  }
+
+  async function saveDate(e) {
+    const val = e.target.value;
+    setEditingDate(false);
+    await updateSong(songId, { estimatedEndDate: val ? new Date(val) : null });
   }
 
   return (
@@ -163,13 +176,32 @@ export default function SongDetail() {
                 </small>
               </div>
 
-              {song.estimatedEndDate && (
-                <div className="mb-3">
-                  <small className="text-secondary d-flex align-items-center gap-1">
-                    <BsCalendar3 /> {t('common:delivery')}: {formatDate(song.estimatedEndDate)}
+              <div className="mb-3">
+                {editingDate ? (
+                  <Form.Control
+                    type="date"
+                    size="sm"
+                    defaultValue={getDateInputValue()}
+                    onChange={saveDate}
+                    onBlur={() => setEditingDate(false)}
+                    autoFocus
+                  />
+                ) : (
+                  <small
+                    className="text-secondary d-flex align-items-center gap-1"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setEditingDate(true)}
+                    title={t('clickToEdit')}
+                  >
+                    <BsCalendar3 />
+                    {t('common:delivery')}:{' '}
+                    {song.estimatedEndDate
+                      ? <span className="text-body">{formatDate(song.estimatedEndDate)}</span>
+                      : <span style={{ opacity: 0.45 }}>+</span>
+                    }
                   </small>
-                </div>
-              )}
+                )}
+              </div>
 
               <div className="text-center mt-3">
                 <Button variant="link" size="sm" className="text-secondary p-0" onClick={() => setShowDelete(true)}>

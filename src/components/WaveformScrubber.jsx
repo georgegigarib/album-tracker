@@ -107,13 +107,20 @@ export default function WaveformScrubber({
 
   // Decode audio and compute peaks when blobUrl changes
   useEffect(() => {
-    if (!blobUrl) { setPeaks(null); return; }
     let cancelled = false;
-    setDecoding(true);
-    computePeaks(blobUrl)
-      .then((p) => { if (!cancelled) setPeaks(p); })
-      .catch(() => { if (!cancelled) setPeaks(null); })
-      .finally(() => { if (!cancelled) setDecoding(false); });
+    async function decode() {
+      if (!blobUrl) { setPeaks(null); return; }
+      setDecoding(true);
+      try {
+        const p = await computePeaks(blobUrl);
+        if (!cancelled) setPeaks(p);
+      } catch {
+        if (!cancelled) setPeaks(null);
+      } finally {
+        if (!cancelled) setDecoding(false);
+      }
+    }
+    decode();
     return () => { cancelled = true; };
   }, [blobUrl]);
 

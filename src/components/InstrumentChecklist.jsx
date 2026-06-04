@@ -57,7 +57,7 @@ export default function InstrumentChecklist({ progress, onToggle, onAdd, onRemov
             <BsPlusLg size={10} />
             {t('addInstrument')}
           </Dropdown.Toggle>
-          <Dropdown.Menu style={{ maxHeight: 200, overflowY: 'auto' }} className="w-100 z-10">
+          <Dropdown.Menu style={{ maxHeight: 200, overflowY: 'auto' }} className="w-100">
             {availableKeys.map((key) => {
               const Icon = getInstrumentIcon(key);
               return (

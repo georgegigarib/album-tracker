@@ -21,6 +21,7 @@ const DEFAULT_INSTRUMENTS = {
   guitars: 'Guitarras',
   bass: 'Bajo',
   drums: 'Batería',
+  percussion: 'Percusión',
   vocals: 'Voces',
 };
 

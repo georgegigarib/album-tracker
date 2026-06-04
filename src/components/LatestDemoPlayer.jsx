@@ -106,8 +106,6 @@ export default function LatestDemoPlayer({ fileId, linkTitle, songTitle, albumId
     setCurrentTime(val);
   }
 
-  const progress = duration ? (currentTime / duration) * 100 : 0;
-
   return (
     <>
       {/* Karaoke full-screen overlay */}

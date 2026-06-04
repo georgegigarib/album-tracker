@@ -22,40 +22,40 @@ export default function DriveAudioPlayer({ fileId }) {
   const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-    if (driveAudioCache.has(fileId)) {
-      setBlobUrl(driveAudioCache.get(fileId));
-      return;
-    }
-    if (!googleAccessToken) return;
-
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
-    fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-      headers: { Authorization: `Bearer ${googleAccessToken}` },
-    })
-      .then(async (res) => {
+    async function load() {
+      if (driveAudioCache.has(fileId)) {
+        if (!cancelled) setBlobUrl(driveAudioCache.get(fileId));
+        return;
+      }
+      if (!googleAccessToken) return;
+
+      if (!cancelled) setLoading(true);
+      if (!cancelled) setError(null);
+
+      try {
+        const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+          headers: { Authorization: `Bearer ${googleAccessToken}` },
+        });
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           const reason = body?.error?.errors?.[0]?.reason || body?.error?.message || res.status;
           throw new Error(`${res.status}:${reason}`);
         }
-        return res.blob();
-      })
-      .then((blob) => {
+        const blob = await res.blob();
         if (cancelled) return;
         const url = URL.createObjectURL(blob);
         driveAudioCache.set(fileId, url);
         setBlobUrl(url);
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    }
 
+    load();
     return () => { cancelled = true; };
   }, [fileId, googleAccessToken]);
 
