@@ -202,6 +202,10 @@ export default function LyricsEditor() {
     setSyncIndex(0);
   }
 
+  function handleClearTimestamp(index) {
+    setWorkingLines((prev) => prev.map((l, i) => (i === index ? { ...l, timestamp: null } : l)));
+  }
+
   // ── Live mode actions ─────────────────────────────────────────────────────
   function stampLiveLine() {
     const text = liveInput.trim();
@@ -993,9 +997,10 @@ export default function LyricsEditor() {
                       </span>
 
                       {/* Timestamp pill */}
-                      <span
+                      <div
                         style={{
-                          padding: '2px 10px',
+                          display: 'flex', alignItems: 'center', gap: 4,
+                          padding: '2px 6px 2px 10px',
                           borderRadius: 20,
                           fontSize: 11,
                           fontFamily: 'monospace',
@@ -1018,7 +1023,22 @@ export default function LyricsEditor() {
                         }}
                       >
                         {isStamped ? formatTime(line.timestamp) : '—'}
-                      </span>
+                        {isStamped && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleClearTimestamp(i); }}
+                            style={{
+                              background: 'none', border: 'none', padding: '0 2px',
+                              cursor: 'pointer', lineHeight: 1,
+                              color: isCurrent ? 'rgba(255,255,255,0.6)' : 'var(--bs-success)',
+                              opacity: 0.6,
+                              fontSize: 13,
+                            }}
+                            title="Quitar timestamp"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
