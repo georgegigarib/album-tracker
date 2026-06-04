@@ -1164,7 +1164,6 @@ export default function LyricsEditor() {
                       width: '100%',
                       height: syncComplete ? 60 : 44,
                       borderRadius: 16,
-                      border: 'none',
                       fontSize: syncComplete ? 15 : 14,
                       fontWeight: 600,
                       cursor: saving ? 'wait' : 'pointer',

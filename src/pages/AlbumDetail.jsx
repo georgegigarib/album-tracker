@@ -74,8 +74,11 @@ export default function AlbumDetail() {
 
   // Keep localOrder in sync with Firestore when it changes externally
   useEffect(() => {
-    if (skipSyncRef.current) { skipSyncRef.current = false; return; }
-    setLocalOrder(album?.songOrder || null);
+    function sync() {
+      if (skipSyncRef.current) { skipSyncRef.current = false; return; }
+      setLocalOrder(album?.songOrder || null);
+    }
+    sync();
   }, [album?.songOrder]);
 
   // Sort songs by localOrder (or album.songOrder as fallback)
