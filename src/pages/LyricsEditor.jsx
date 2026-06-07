@@ -234,18 +234,40 @@ export default function LyricsEditor() {
     setWorkingLines((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function sortedLines(lines) {
+    return [...lines].sort((a, b) => {
+      if (a.timestamp === null && b.timestamp === null) return 0;
+      if (a.timestamp === null) return 1;
+      if (b.timestamp === null) return -1;
+      return a.timestamp - b.timestamp;
+    });
+  }
+
+  async function handleLiveSave() {
+    if (workingLines.length === 0) return;
+    setSaving(true);
+    try {
+      const sorted = sortedLines(workingLines);
+      setWorkingLines(sorted);
+      const textForRaw = sorted.map((l) => l.text).join('\n');
+      await saveLyrics({
+        rawText: textForRaw,
+        lines: sorted,
+        linkedLinkId: selectedLinkId || null,
+        linkedLinkDuration: duration > 0 ? duration : (lyrics?.linkedLinkDuration ?? null),
+      });
+      setSavedOk(true);
+      setTimeout(() => setSavedOk(false), 3000);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function handleLiveFinish() {
     if (workingLines.length === 0) return;
     setSaving(true);
     try {
-      // Sort by timestamp so newly written lines land in the right position
-      // regardless of when the user entered live mode. Null timestamps go last.
-      const sorted = [...workingLines].sort((a, b) => {
-        if (a.timestamp === null && b.timestamp === null) return 0;
-        if (a.timestamp === null) return 1;
-        if (b.timestamp === null) return -1;
-        return a.timestamp - b.timestamp;
-      });
+      const sorted = sortedLines(workingLines);
       setWorkingLines(sorted);
       const textForRaw = sorted.map((l) => l.text).join('\n');
       await saveLyrics({
@@ -658,6 +680,12 @@ export default function LyricsEditor() {
                 ? <><Spinner size="sm" className="me-2" />{t('lyricsEditor.write.saving')}</>
                 : t('lyricsEditor.write.saveLyrics')}
             </Button>
+
+            {selectedFileId && (
+              <div className="mt-4">
+                {renderPlayer()}
+              </div>
+            )}
           </Card.Body>
         </Card>
       )}
@@ -827,20 +855,36 @@ export default function LyricsEditor() {
                   : t('lyricsEditor.live.versesHint', { count: workingLines.length })}
               </span>
               {workingLines.length > 0 && (
-                <button
-                  onClick={handleLiveFinish}
-                  disabled={saving}
-                  style={{
-                    background: saving ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0d6efd, #6f42c1)',
-                    border: 'none', color: 'white',
-                    borderRadius: 20, padding: '7px 18px',
-                    fontSize: 13, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
-                    boxShadow: saving ? 'none' : '0 4px 14px rgba(13,110,253,0.3)',
-                    transition: 'all 0.2s', flexShrink: 0,
-                  }}
-                >
-                  {saving ? t('lyricsEditor.live.saving') : t('lyricsEditor.live.reviewSync')}
-                </button>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <button
+                    onClick={handleLiveSave}
+                    disabled={saving}
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.8)',
+                      borderRadius: 20, padding: '7px 16px',
+                      fontSize: 13, fontWeight: 500, cursor: saving ? 'wait' : 'pointer',
+                      transition: 'all 0.2s', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', gap: 5,
+                    }}
+                  >
+                    {saving ? t('lyricsEditor.live.saving') : (savedOk ? '✓ ' + t('lyricsEditor.saved') : '💾 ' + t('lyricsEditor.write.saveLyrics').replace('💾 ', ''))}
+                  </button>
+                  <button
+                    onClick={handleLiveFinish}
+                    disabled={saving}
+                    style={{
+                      background: saving ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0d6efd, #6f42c1)',
+                      border: 'none', color: 'white',
+                      borderRadius: 20, padding: '7px 18px',
+                      fontSize: 13, fontWeight: 600, cursor: saving ? 'wait' : 'pointer',
+                      boxShadow: saving ? 'none' : '0 4px 14px rgba(13,110,253,0.3)',
+                      transition: 'all 0.2s', flexShrink: 0,
+                    }}
+                  >
+                    {saving ? t('lyricsEditor.live.saving') : t('lyricsEditor.live.reviewSync')}
+                  </button>
+                </div>
               )}
             </div>
           </div>
