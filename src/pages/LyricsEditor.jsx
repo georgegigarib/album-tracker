@@ -25,13 +25,22 @@ function formatTime(s) {
 }
 
 function parseLines(raw, existingLines = []) {
-  const byText = {};
-  existingLines.forEach((l) => { byText[l.text] = l.timestamp; });
+  // Group timestamps by text in order of appearance, so repeated lines
+  // each get their own timestamp instead of all sharing the last one.
+  const timestampQueues = {};
+  existingLines.forEach((l) => {
+    if (!timestampQueues[l.text]) timestampQueues[l.text] = [];
+    timestampQueues[l.text].push(l.timestamp);
+  });
   return raw
     .split('\n')
     .map((t) => t.trim())
     .filter(Boolean)
-    .map((text) => ({ text, timestamp: byText[text] ?? null }));
+    .map((text) => {
+      const queue = timestampQueues[text];
+      const timestamp = queue && queue.length > 0 ? queue.shift() : null;
+      return { text, timestamp };
+    });
 }
 
 export default function LyricsEditor() {
